@@ -101,6 +101,16 @@ run paster-test -framework AppKit -lsqlite3 \
 # creeping into the stored chord shows up as a link failure.
 run key-shortcut-test Spare/HotKeys/KeyShortcut.swift
 
+# The only harness that writes `NSPasteboard.general`, and only against `app.spare.dev`: it
+# launches the app it just built and asserts the copy landed. The build is its own statement —
+# joined with `&&` a failed build would be a non-final AND-OR member and `set -e` would sail past
+# it. The harness itself skips cleanly when the app is not there. Only ClipboardItem is compiled
+# in, for `fold`: the search key it asserts on has to be the shipped one.
+if [ "$emit_db" -eq 0 ] && { [ -z "$only" ] || [ "$only" = "e2e-test" ]; }; then
+    ./Scripts/build-app.sh Debug
+fi
+run e2e-test -framework AppKit -lsqlite3 Spare/Clipboard/Core/ClipboardItem.swift
+
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
     [ -f .compile ] || echo '[]' > .compile
