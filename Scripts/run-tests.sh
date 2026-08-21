@@ -67,6 +67,8 @@ run() {
 
 run app-paths-test Spare/Platform/AppPaths.swift
 run clipboard-item-test Spare/Clipboard/Core/ClipboardItem.swift
+run capture-policy-test Spare/Clipboard/Core/ClipboardItem.swift \
+                        Spare/Clipboard/Core/CapturePolicy.swift
 
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
