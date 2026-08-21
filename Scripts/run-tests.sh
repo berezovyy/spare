@@ -66,6 +66,7 @@ run() {
 # Harnesses register here, one `run` line per phase that adds a Tests/*.swift.
 
 run app-paths-test Spare/Platform/AppPaths.swift
+run clipboard-item-test Spare/Clipboard/Core/ClipboardItem.swift
 
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
