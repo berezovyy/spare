@@ -1,0 +1,54 @@
+name: Spare
+options:
+  bundleIdPrefix: app.spare
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Manual
+    # Stable self-signed identity so macOS keeps the Accessibility grant across rebuilds.
+    # Create it once — see docs/plan/00-conventions.md § Signing.
+    CODE_SIGN_IDENTITY: "Spare Self-Signed"
+    ENABLE_HARDENED_RUNTIME: NO
+    SWIFT_STRICT_CONCURRENCY: complete
+  configs:
+    Release:
+      # Strip the shipped binary (dSYM is still generated first) and drop unused code.
+      SWIFT_OPTIMIZATION_LEVEL: "-Osize"
+      DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+      DEPLOYMENT_POSTPROCESSING: YES
+      STRIP_INSTALLED_PRODUCT: YES
+      STRIP_SWIFT_SYMBOLS: YES
+      DEAD_CODE_STRIPPING: YES
+
+targets:
+  Spare:
+    type: application
+    platform: macOS
+    sources:
+      - path: Spare
+    settings:
+      base:
+        INFOPLIST_FILE: Spare/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Spare/Spare.entitlements
+        COMBINE_HIDPI_IMAGES: YES
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/../Frameworks"
+      configs:
+        # Debug is its own channel: a distinct bundle id means a locally-run build gets its own
+        # prefs, caches, TCC grants and login item instead of inheriting — and corrupting — the
+        # installed app's state.
+        Debug:
+          PRODUCT_NAME: Spare Dev
+          PRODUCT_BUNDLE_IDENTIFIER: app.spare.dev
+        Release:
+          PRODUCT_NAME: Spare
+          PRODUCT_BUNDLE_IDENTIFIER: app.spare
