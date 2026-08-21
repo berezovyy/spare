@@ -73,6 +73,9 @@ run capture-policy-test Spare/Clipboard/Core/ClipboardItem.swift \
 run clipboard-test -lsqlite3 Spare/Clipboard/Core/ClipboardItem.swift \
                              Spare/Clipboard/Core/ClipboardStore.swift
 run settings-test Spare/Settings/Settings.swift
+# -framework: swiftc links neither AppKit nor ImageIO from the import alone.
+run image-thumbnail-test -framework AppKit -framework ImageIO \
+                         Spare/Platform/ImageThumbnail.swift
 
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
