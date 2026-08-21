@@ -88,6 +88,15 @@ run geometry-test -framework AppKit -framework ImageIO -lsqlite3 \
                   Spare/Palette/RowViews.swift \
                   Spare/Palette/ListController.swift
 
+# Paster plus Core and the Accessibility check it guards ⌘V with — never the monitor: the write
+# seam has to compile without anything that touches `NSPasteboard.general`.
+run paster-test -framework AppKit -lsqlite3 \
+                Spare/Clipboard/Core/ClipboardItem.swift \
+                Spare/Clipboard/Core/ClipboardStore.swift \
+                Spare/Clipboard/Core/CapturePolicy.swift \
+                Spare/Platform/Permissions.swift \
+                Spare/Clipboard/Paster.swift
+
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
     [ -f .compile ] || echo '[]' > .compile
