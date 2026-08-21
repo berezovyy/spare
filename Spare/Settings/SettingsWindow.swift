@@ -12,6 +12,7 @@ final class SettingsWindow: NSWindowController, NSWindowDelegate {
     private let settings: Settings
     private let store: ClipboardStore
     private let hotKeys: HotKeyCenter
+    private let dialogs: ConfirmDialog
 
     private let retention = NSPopUpButton()
     private let imageBudget = NSPopUpButton()
@@ -31,10 +32,13 @@ final class SettingsWindow: NSWindowController, NSWindowDelegate {
 
     private static let budgets = [128, 256, 512, 1_024, 2_048]
 
-    init(settings: Settings, store: ClipboardStore, hotKeys: HotKeyCenter) {
+    init(
+        settings: Settings, store: ClipboardStore, hotKeys: HotKeyCenter, dialogs: ConfirmDialog
+    ) {
         self.settings = settings
         self.store = store
         self.hotKeys = hotKeys
+        self.dialogs = dialogs
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 460, height: 10),
             styleMask: [.titled, .closable],
@@ -102,7 +106,6 @@ final class SettingsWindow: NSWindowController, NSWindowDelegate {
         let reveal = NSButton(title: "Reveal Data Folder", target: self, action: #selector(reveal))
         resetButton.target = self
         resetButton.action = #selector(resetDatabase)
-        resetButton.isEnabled = false
 
         addRow(grid, "Shortcut", hotKeyButton)
         addRow(grid, "Keep history", retention)
@@ -214,10 +217,16 @@ final class SettingsWindow: NSWindowController, NSWindowDelegate {
         NSWorkspace.shared.open(AppPaths.applicationSupport())
     }
 
+    /// The only path that empties history. Rows and image files go; the database file itself
+    /// stays, because unlinking it under the store's open connection would leave every later
+    /// write landing in a file nothing can read.
     @objc private func resetDatabase() {
-        // Deliberately inert until the confirm dialog exists: an `NSAlert` here would spin a
-        // nested run loop that a held hotkey stacks alerts inside.
-        _ = store
+        Task { [weak self] in
+            guard let self else { return }
+            let confirmed = await dialogs.ask(
+                "Delete all clipboard history?", confirm: "Delete", destructive: true)
+            if confirmed { store.clearAll() }
+        }
     }
 
     // MARK: - Recording
