@@ -6,8 +6,10 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private static var shared: AppDelegate?
 
-    // The status item must outlive didFinishLaunching or the menu bar icon disappears.
-    private var statusItem: NSStatusItem?
+    // Both must outlive didFinishLaunching: the core owns every part of the app, and a released
+    // status item takes the menu bar icon with it.
+    private var core: AppCore?
+    private var statusItem: StatusItem?
 
     static func main() {
         let app = NSApplication.shared
@@ -25,13 +27,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        item.button?.image = NSImage(
-            systemSymbolName: "doc.on.clipboard",
-            accessibilityDescription: "Spare"
-        )
-        item.button?.image?.isTemplate = true
-        statusItem = item
+        let core = AppCore()
+        statusItem = StatusItem(core: core)
+        core.start()
+        self.core = core
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
