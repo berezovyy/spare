@@ -154,10 +154,10 @@ final class ClipboardStore {
             return
         }
         let manager = FileManager.default
-        let contents = try? manager.contentsOfDirectory(
-            at: imagesDir, includingPropertiesForKeys: nil)
-        for url in contents ?? [] where owns(url.path) {
-            try? manager.removeItem(at: url)
+        // Names, not URLs: an enumerated URL can come back with a resolved base, which `owns`
+        // would then read as a path outside our own directory.
+        for name in (try? manager.contentsOfDirectory(atPath: imagesDir.path)) ?? [] {
+            try? manager.removeItem(at: imagesDir.appendingPathComponent(name))
         }
         items = []
     }
