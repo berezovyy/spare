@@ -94,7 +94,7 @@ final class Settings {
         defer { isLoading = false }
 
         let days = defaults.object(forKey: SettingsKey.retentionDays.rawValue) as? Int
-        retention = days.flatMap(Retention.init(rawValue:)) ?? .month
+        retention = days.flatMap { Retention(rawValue: $0) } ?? .month
         ignoredApps = defaults.object(forKey: SettingsKey.ignoredApps.rawValue) as? [String] ?? []
         capturesImages = flag(.capturesImages, default: true)
         imageBudgetMB = defaults.object(forKey: SettingsKey.imageBudgetMB.rawValue) as? Int ?? 512
@@ -113,7 +113,7 @@ final class Settings {
     /// A string-backed case, or nil when the key is unset or names a case we no longer ship.
     private func named<Value: RawRepresentable>(_ key: SettingsKey) -> Value?
     where Value.RawValue == String {
-        (defaults.object(forKey: key.rawValue) as? String).flatMap(Value.init(rawValue:))
+        (defaults.object(forKey: key.rawValue) as? String).flatMap { Value(rawValue: $0) }
     }
 
     // MARK: - Writing

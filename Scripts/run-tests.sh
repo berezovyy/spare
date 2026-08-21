@@ -72,6 +72,7 @@ run capture-policy-test Spare/Clipboard/Core/ClipboardItem.swift \
 # -lsqlite3: the store links the system dylib, which swiftc does not pick up from the import.
 run clipboard-test -lsqlite3 Spare/Clipboard/Core/ClipboardItem.swift \
                              Spare/Clipboard/Core/ClipboardStore.swift
+run settings-test Spare/Settings/Settings.swift
 
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
