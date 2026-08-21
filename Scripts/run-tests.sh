@@ -97,6 +97,10 @@ run paster-test -framework AppKit -lsqlite3 \
                 Spare/Platform/Permissions.swift \
                 Spare/Clipboard/Paster.swift
 
+# Foundation-only, and deliberately so: no -framework here, so a Carbon or AppKit dependency
+# creeping into the stored chord shows up as a link failure.
+run key-shortcut-test Spare/HotKeys/KeyShortcut.swift
+
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
     [ -f .compile ] || echo '[]' > .compile
