@@ -38,7 +38,8 @@ final class EdgeDissolve {
         update()
     }
 
-    deinit {
+    // Isolated so teardown may read the main-actor token; a nonisolated deinit cannot touch it.
+    isolated deinit {
         if let observer { NotificationCenter.default.removeObserver(observer) }
     }
 

@@ -76,6 +76,17 @@ run settings-test Spare/Settings/Settings.swift
 # -framework: swiftc links neither AppKit nor ImageIO from the import alone.
 run image-thumbnail-test -framework AppKit -framework ImageIO \
                          Spare/Platform/ImageThumbnail.swift
+# The list's pure geometry, compiled against the views it actually ships with — a decision that
+# leaks into a row view or the store shows up here as a compile failure.
+run geometry-test -framework AppKit -framework ImageIO -lsqlite3 \
+                  Spare/Design/Theme.swift \
+                  Spare/Design/EdgeDissolve.swift \
+                  Spare/Design/ThinScroller.swift \
+                  Spare/Clipboard/Core/ClipboardItem.swift \
+                  Spare/Clipboard/Core/ClipboardStore.swift \
+                  Spare/Platform/ImageThumbnail.swift \
+                  Spare/Palette/RowViews.swift \
+                  Spare/Palette/ListController.swift
 
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
