@@ -117,8 +117,9 @@ final class ListController: NSObject, NSTableViewDataSource, NSTableViewDelegate
 
     // MARK: - Updating
 
-    /// No debounce: a scan of 1,000 entries is under 3 ms even when every one is long
-    /// (measured), and `reloadData` only asks for visible rows.
+    /// No debounce: a scan of 1,000 entries stays well inside a frame, under 3.5 ms when every
+    /// one is 1.7 KB and 7 ms at the 4 KB search-key cap (measured, worst case of a few thousand
+    /// keystrokes), and `reloadData` only asks for visible rows.
     func queryChanged(_ query: String) {
         self.query = query
         reload()

@@ -154,6 +154,11 @@ struct GeometryTests {
         if let doomed = list.selectedItem { store.remove(doomed) }
         expect(list.selection == position, "deleting keeps the selection where it was")
         expect(list.selectedItem?.id == next, "on the entry that followed the deleted one")
+
+        // Paste and copy promote the selected row: the same one-change rule applies.
+        guard let kept = list.selectedItem else { return }
+        store.promote(kept)
+        expect(list.selectedItem?.id == kept.id, "promoting keeps the selection on the entry")
     }
 
     /// ⌘P is ⌘P on a Ukrainian or French keyboard too; a Dvorak user keeps their own letters.
