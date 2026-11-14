@@ -16,6 +16,14 @@
   <img src="https://img.shields.io/badge/license-AGPL_v3-8250df?style=flat-square" alt="AGPL v3 license" />
 </p>
 
+<p align="center">
+  <a href="readme/demo.mp4">
+    <img src="readme/demo.webp" width="100%" alt="⌘⇧V opens Spare's palette; typing “stag key” narrows a long history to the one staging key, and Return pastes it into a message. Then one shortcut per beat: hold ⌘ for numbered rows, ⌘P to pin, ⌘F to filter to images, ⌘⌫ to delete and ⌘Z to bring it back. Passwords are never recorded; under 25 MB of memory, under 0.05% CPU at rest, no network connections." />
+  </a>
+  <br />
+  <sub><a href="readme/demo.mp4">Watch with sound</a> · music: “Electro Dreams” by Arulo (Mixkit)</sub>
+</p>
+
 Press **⌘⇧V**, type a few letters of something you copied earlier, press Return, and it is pasted
 where you were typing.
 

@@ -21,3 +21,10 @@ Storyline B ("Cut on the beat"), 42 s, 1920×1080, 30 fps. A and C are in STORYL
 ## Weakest shot
 The opening of the payoff (28–29 s): blurred rows pouring into a palette. With more time it should
 build to something bigger, for example the rows landing on the beat grid.
+
+## Delivery render
+- `renders/spare.mp4`: 1920×1080, 30 fps, H.264 + AAC, 42.0 s, 5.4 MB (`render -q delivery`).
+- Audio measured on the file: −15.6 LUFS integrated, true peak −1.3 dBTP, no clipping; the drop
+  lands at 6.0 s. Still not heard by anyone.
+- README copies: `../demo.mp4` (the render) and `../demo.webp` (1280 wide, 25 fps, lossy q75,
+  3.7 MB), made with `ffmpeg -vf fps=25,scale=1280:-2` and `img2webp -lossy -q 75 -m 6 -d 40`.
