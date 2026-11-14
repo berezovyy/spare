@@ -42,6 +42,14 @@ final class Panel: NSPanel {
         contentView = surface
     }
 
+    /// ⌘-chords, offered before the field editor sees them. True when the owner consumed one.
+    var onKeyEquivalent: ((NSEvent) -> Bool)?
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if onKeyEquivalent?(event) == true { return true }
+        return super.performKeyEquivalent(with: event)
+    }
+
     /// Borderless windows refuse key by default, so the search field would never see a keystroke.
     override var canBecomeKey: Bool { true }
 

@@ -14,10 +14,11 @@ struct GeometryTests {
         dissolveIsOpaqueWhereNothingHasScrolledPast()
         dissolveMidBandIsBetweenFloorAndFull()
         dissolveSettlesOnTheFloorAtAndPastTheBand()
-        headerRowsAreNeverSelected()
-        movingUpFromTheFirstHistoryRowSkipsOntoTheLastPin()
-        movingDownFromTheLastPinSkipsOntoTheFirstHistoryRow()
+        dissolveEngagesForAListThatOnlyOverflowsTheInsets()
+        steppingStopsAtBothEnds()
         movingInAnEmptyListIsANoOp()
+        numberKeysReachTheRowsTheyLabel()
+        storeChangesKeepTheSelectionOnTheSameEntry()
 
         print("\(passes)/\(passes + failures) passed")
         if failures > 0 { exit(1) }
@@ -64,54 +65,94 @@ struct GeometryTests {
                 EdgeDissolve.alpha(distance: bottomBand, band: bottomBand, floor: bottomFloor),
                 bottomFloor),
             "the bottom edge is at its floor after one band")
-        expect(bottomFloor > topFloor, "the footer floor is the heavier of the two")
-    }
-
-    // MARK: - Header stepping
-
-    static func headerRowsAreNeverSelected() {
-        let rows = ListController.rows(from: pinned(2) + history(3))
-        expect(rows.count == 7, "two headers lead their sections")
-        expect(isHeader(rows[0]), "the pinned section opens with a header")
-        expect(isHeader(rows[3]), "the history section opens with a header")
-        expect(ListController.firstSelectable(in: rows) == 1, "selection opens on the first pin")
-
-        var index = ListController.firstSelectable(in: rows)
-        // Walk the whole list: no step in either direction may land on a header.
-        while let next = ListController.step(from: index, delta: 1, in: rows) {
-            expect(!isHeader(rows[next]), "stepping down never lands on a header")
-            index = next
-        }
-        while let next = ListController.step(from: index, delta: -1, in: rows) {
-            expect(!isHeader(rows[next]), "stepping up never lands on a header")
-            index = next
-        }
-        expect(index == 1, "walking back up ends on the first pin")
-    }
-
-    static func movingUpFromTheFirstHistoryRowSkipsOntoTheLastPin() {
-        let rows = ListController.rows(from: pinned(2) + history(3))
-        // 0 header, 1-2 pins, 3 header, 4-6 history.
         expect(
-            ListController.step(from: 4, delta: -1, in: rows) == 2, "up skips the History header")
+            topFloor == 0 && bottomFloor == 0,
+            "no row ghosts through the search text or the key hints")
     }
 
-    static func movingDownFromTheLastPinSkipsOntoTheFirstHistoryRow() {
-        let rows = ListController.rows(from: pinned(2) + history(3))
-        expect(
-            ListController.step(from: 2, delta: 1, in: rows) == 4, "down skips the History header")
-        expect(ListController.step(from: 6, delta: 1, in: rows) == nil, "the last row is the end")
+    /// A list taller than the gap between the bars but shorter than the panel still runs under
+    /// the footer. Measured against the full height it looked like it fit, and the mask went
+    /// fully opaque — the last row then printed straight through the key hints.
+    static func dissolveEngagesForAListThatOnlyOverflowsTheInsets() {
+        let height: CGFloat = 420
+        let scroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: 600, height: height))
+        scroll.automaticallyAdjustsContentInsets = false
+        scroll.contentInsets = NSEdgeInsets(top: 54, left: 0, bottom: 40, right: 0)
+        // 398 < 420, but well past the 326 points between the bars.
+        scroll.documentView = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 398))
+        let dissolve = EdgeDissolve(scrollView: scroll)
+        dissolve.update()
+        let mask = scroll.layer?.mask as? CAGradientLayer
+        expect(mask?.colors?.count == 6, "the mask ramps instead of going fully opaque")
+        expect(mask?.frame.height == height, "the mask covers the whole scroll view")
+    }
+
+    // MARK: - Stepping and number keys
+
+    static func steppingStopsAtBothEnds() {
+        expect(ListController.step(from: 0, delta: 1, count: 3) == 1, "down moves one row")
+        expect(ListController.step(from: 2, delta: 1, count: 3) == nil, "the last row is the end")
+        expect(ListController.step(from: 0, delta: -1, count: 3) == nil, "up off the top stops")
+        expect(ListController.step(from: 1, delta: 0, count: 3) == nil, "no delta, no move")
     }
 
     static func movingInAnEmptyListIsANoOp() {
-        let rows = ListController.rows(from: [])
-        expect(rows.isEmpty, "no sections without entries")
-        expect(ListController.firstSelectable(in: rows) == -1, "nothing is selectable")
-        expect(ListController.step(from: -1, delta: 1, in: rows) == nil, "down is a no-op")
-        expect(ListController.step(from: -1, delta: -1, in: rows) == nil, "up is a no-op")
-        // A list of pins only still has one header, and it is still unreachable.
-        let onlyPins = ListController.rows(from: pinned(1))
-        expect(ListController.step(from: 1, delta: -1, in: onlyPins) == nil, "up off the top stops")
+        expect(ListController.step(from: -1, delta: 1, count: 0) == nil, "down is a no-op")
+        expect(ListController.step(from: -1, delta: -1, count: 0) == nil, "up is a no-op")
+    }
+
+    /// The number a row shows while ⌘ is held is the number that pastes it: ⌘1 is the top row.
+    static func numberKeysReachTheRowsTheyLabel() {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("spare-geometry-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = ClipboardStore(directory: dir)
+        store.load()
+        for index in 0..<12 { store.addText("item \(index)", sourceApp: nil) }
+        let list = ListController(store: store)
+        list.reload()
+        expect(list.item(number: 1)?.id == list.rows.first?.id, "⌘1 is the first row")
+        expect(list.item(number: 9)?.id == list.rows[8].id, "⌘9 is the ninth row")
+        expect(list.item(number: 0) == nil, "there is no ⌘0 row")
+        expect(list.item(number: 10) == nil, "the shortcuts stop at nine")
+    }
+
+    /// A pin, an unpin or a delete re-renders the list without throwing the user back to the
+    /// top. Wired the way `WindowController` wires it — one reload per store change, keeping
+    /// whatever is selected at that moment — so a store that fires twice per edit shows up here.
+    static func storeChangesKeepTheSelectionOnTheSameEntry() {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("spare-geometry-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = ClipboardStore(directory: dir)
+        store.load()
+        for index in 0..<5 { store.addText("item \(index)", sourceApp: nil) }
+        let list = ListController(store: store)
+        store.onChange = { list.reload(keeping: list.selectedItem?.id) }
+        list.reload()
+        list.move(1)
+        list.move(1)
+        guard let chosen = list.selectedItem else {
+            expect(false, "a row is selected")
+            return
+        }
+        store.togglePinned(chosen)
+        expect(list.selectedItem?.id == chosen.id, "pinning keeps the selection on the entry")
+        expect(list.selection == 0, "which now leads the list")
+
+        store.addText("arrives while open", sourceApp: nil)
+        expect(list.selectedItem?.id == chosen.id, "a new capture does not move the selection")
+
+        guard let pinnedNow = list.selectedItem else { return }
+        store.togglePinned(pinnedNow)
+        expect(list.selectedItem?.id == chosen.id, "unpinning keeps the selection on the entry")
+
+        list.move(1)
+        let position = list.selection
+        let next = list.rows[position + 1].id
+        if let doomed = list.selectedItem { store.remove(doomed) }
+        expect(list.selection == position, "deleting keeps the selection where it was")
+        expect(list.selectedItem?.id == next, "on the entry that followed the deleted one")
     }
 
     // MARK: - Helpers
@@ -129,11 +170,6 @@ struct GeometryTests {
 
     static func history(_ count: Int) -> [ClipboardItem] {
         (0..<count).map { ClipboardItem(kind: .text, text: "item \($0)") }
-    }
-
-    static func isHeader(_ row: ListController.Row) -> Bool {
-        if case .header = row { return true }
-        return false
     }
 
     static func expect(

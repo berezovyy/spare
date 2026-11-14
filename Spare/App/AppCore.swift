@@ -56,6 +56,7 @@ final class AppCore {
 
         hotKeys.onPress = { [weak self] in self?.toggle() }
         windowController.onActivate = { [weak self] in self?.activate($0) }
+        windowController.onCopy = { [weak self] in self?.copy($0) }
         dialogs.onPresentingChange = { [weak self] in
             self?.windowController.isPresentingDialog = $0
         }
@@ -102,6 +103,13 @@ final class AppCore {
             return
         }
         Paster.paste(item, store: store, into: target)
+    }
+
+    /// ⌘C: onto the clipboard, then back to wherever the user was, with nothing pasted.
+    private func copy(_ item: ClipboardItem) {
+        windowController.hide(restoreFocus: true)
+        store.promote(item)
+        Paster.copy(item, store: store)
     }
 
     private func askForAccessibility() {

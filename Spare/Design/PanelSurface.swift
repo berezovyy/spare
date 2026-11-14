@@ -1,10 +1,10 @@
 import AppKit
 
-/// The panel's backdrop: a scrim over behind-window blur, clipped to a continuous corner. There is
-/// no solid background anywhere — depth comes from the desktop showing through.
+/// A window's backdrop: one sheet of Liquid Glass, tinted toward the ink's opposite so text keeps
+/// its contrast over any wallpaper. Content is added as siblings *above* the glass, never into
+/// it — `NSGlassEffectView` only guarantees z-order for its own `contentView`.
 final class PanelSurface: NSView {
-    private let blur = NSVisualEffectView()
-    private let scrim = NSView()
+    private let glass = NSGlassEffectView()
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -12,21 +12,15 @@ final class PanelSurface: NSView {
         layer?.cornerRadius = Theme.Radius.panel
         // `NSBezierPath(roundedRect:)` would draw circular corners; the design is the squircle.
         layer?.cornerCurve = .continuous
+        // Rows scroll under the corners; the clip keeps them inside the glass's own shape.
         layer?.masksToBounds = true
 
-        blur.blendingMode = .behindWindow
-        blur.material = .hudWindow
-        blur.state = .active
-        blur.autoresizingMask = [.width, .height]
-        blur.frame = bounds
-        addSubview(blur)
-
-        // Above the blur: the scrim darkens the dark surface and lightens the light one.
-        scrim.wantsLayer = true
-        scrim.layer?.backgroundColor = Theme.Colors.panelScrim.cgColor
-        scrim.autoresizingMask = [.width, .height]
-        scrim.frame = bounds
-        addSubview(scrim)
+        glass.style = .regular
+        glass.cornerRadius = Theme.Radius.panel
+        applyTint()
+        glass.autoresizingMask = [.width, .height]
+        glass.frame = bounds
+        addSubview(glass)
     }
 
     @available(*, unavailable)
@@ -34,14 +28,16 @@ final class PanelSurface: NSView {
 
     override var isOpaque: Bool { false }
 
-    /// `cgColor` is resolved, not dynamic, so the scrim is repainted when the appearance flips.
-    override func updateLayer() {
-        super.updateLayer()
-        scrim.layer?.backgroundColor = Theme.Colors.panelScrim.cgColor
-    }
-
     override func viewDidChangeEffectiveAppearance() {
         super.viewDidChangeEffectiveAppearance()
-        needsDisplay = true
+        applyTint()
+    }
+
+    /// Resolved to a concrete colour for the current appearance: re-assigning the same dynamic
+    /// object on a Light/Dark flip may be ignored as unchanged, leaving the old branch's tint.
+    private func applyTint() {
+        effectiveAppearance.performAsCurrentDrawingAppearance {
+            glass.tintColor = Theme.Colors.glassTint.usingColorSpace(.sRGB)
+        }
     }
 }

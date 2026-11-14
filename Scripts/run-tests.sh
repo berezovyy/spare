@@ -82,9 +82,11 @@ run geometry-test -framework AppKit -framework ImageIO -lsqlite3 \
                   Spare/Design/Theme.swift \
                   Spare/Design/EdgeDissolve.swift \
                   Spare/Design/ThinScroller.swift \
+                  Spare/Design/KeyCapChip.swift \
                   Spare/Clipboard/Core/ClipboardItem.swift \
                   Spare/Clipboard/Core/ClipboardStore.swift \
                   Spare/Platform/ImageThumbnail.swift \
+                  Spare/Platform/AppIdentity.swift \
                   Spare/Palette/RowViews.swift \
                   Spare/Palette/ListController.swift
 
