@@ -14,33 +14,39 @@ final class EdgeDissolve {
 
     private weak var scrollView: NSScrollView?
     private let gradient = CAGradientLayer()
-    private var observer: (any NSObjectProtocol)?
+    private var observers: [any NSObjectProtocol] = []
 
     init(scrollView: NSScrollView) {
         self.scrollView = scrollView
         scrollView.wantsLayer = true
-        // Unit coordinates run bottom-up on a CALayer; flip once here so the stops read top-first.
-        gradient.isGeometryFlipped = true
+        // Stops read top-first. The scroll view's layer is already flipped for a flipped clip view,
+        // so a mask that flips itself again lands upside down — measured: the header band then
+        // dissolves the footer edge and the footer band does nothing.
         gradient.startPoint = CGPoint(x: 0.5, y: 0)
         gradient.endPoint = CGPoint(x: 0.5, y: 1)
         gradient.frame = scrollView.bounds
         scrollView.layer?.mask = gradient
 
-        // The clip view posts this only when it is told to; a scroll otherwise moves in silence.
+        // Neither view posts unless told to. Bounds is a scroll; frame is the first layout — a
+        // mask sized before it stays zero-sized, and a zero-sized mask is no mask at all.
         scrollView.contentView.postsBoundsChangedNotifications = true
-        observer = NotificationCenter.default.addObserver(
-            forName: NSView.boundsDidChangeNotification,
-            object: scrollView.contentView,
-            queue: .main
-        ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.update() }
+        scrollView.postsFrameChangedNotifications = true
+        let watched: [(NSNotification.Name, NSView)] = [
+            (NSView.boundsDidChangeNotification, scrollView.contentView),
+            (NSView.frameDidChangeNotification, scrollView)
+        ]
+        observers = watched.map { name, view in
+            NotificationCenter.default.addObserver(forName: name, object: view, queue: .main) {
+                [weak self] _ in
+                MainActor.assumeIsolated { self?.update() }
+            }
         }
         update()
     }
 
     // Isolated so teardown may read the main-actor token; a nonisolated deinit cannot touch it.
     isolated deinit {
-        if let observer { NotificationCenter.default.removeObserver(observer) }
+        for observer in observers { NotificationCenter.default.removeObserver(observer) }
     }
 
     /// Recomputes the mask for the current scroll offset. Call after the list reloads or resizes.
@@ -49,8 +55,11 @@ final class EdgeDissolve {
         let height = scrollView.bounds.height
         let contentHeight = scrollView.documentView?.bounds.height ?? 0
         let offset = scrollView.contentView.bounds.origin.y
-        let topDistance = max(0, offset)
-        let bottomDistance = max(0, contentHeight - height - offset)
+        let insets = scrollView.contentInsets
+        // Measured from the bars' inner edges, not the panel's: a row under the footer is hidden
+        // whether or not it also runs past the bottom of the window.
+        let topDistance = max(0, offset + insets.top)
+        let bottomDistance = max(0, contentHeight + insets.bottom - height - offset)
         let topBand = Theme.Dissolve.topBand
         let bottomBand = Theme.Dissolve.bottomBand
 
@@ -58,8 +67,10 @@ final class EdgeDissolve {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         gradient.frame = scrollView.bounds
-        // Below the summed bands the stops would run out of order, so the mask stays fully opaque.
-        if contentHeight <= height || height <= topBand + bottomBand {
+        // What fits between the bars never passes under one. Measured against the inset height,
+        // not the full one: a list taller than the gap but shorter than the panel still runs
+        // under the footer. Below the summed bands the stops would run out of order.
+        if contentHeight <= height - insets.top - insets.bottom || height <= topBand + bottomBand {
             gradient.colors = [Self.ink(1), Self.ink(1)]
             gradient.locations = [0, 1]
         } else {
