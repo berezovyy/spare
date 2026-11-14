@@ -1,5 +1,22 @@
 # SPEC — "Cut on the beat" (storyline B)
 
+## v2 (current): 25 s, faster and harder
+
+Asked for: faster than v1's 42 s, more epic, no API key as the example.
+- 25 s = 750 frames. Track enters at 13.035 s so the drop lands on film 3.0.
+- Example clip: "Flight to Lisbon · booking KX7Q2M", found by typing "lisbon" (folds at "lis").
+- Shots: 0-3 hook (line on 16ths, 40 copies tear past, ⌘ ⇧ V slam on 16ths, V zooms through);
+  3-6 search (stage shake on the drop, paste lands at 4.6); 6-11 one chord per second, fields wipe
+  in from the left, a stage kick on every press; 11-12.5 passwords; 12.5-15.5 three numbers at
+  1 s each (count-up, letters on frames, zoom slam); 15.5-19.5 payoff (camera rips back from 3.4x
+  inside the palette, lands with a kick, Return bursts into white from the ↵ chip); 19.5-25 claim
+  on 16ths, violet circle flood, icon slam + shake, name per letter, ⌘⇧V pressed.
+- Render-time motion blur is on (`data-motion-blur="on"` on the root).
+- Line holds are deliberately under the reading floor in the montage; the payoff line, the paste
+  and the end card keep theirs.
+
+## v1 (superseded): the 42 s cut below
+
 GOAL:    a developer watching the README knows in 40 s that ⌘⇧V brings back anything they copied,
          that every action is one chord, and that it costs nothing to keep running.
 OUTPUT:  HyperFrames, 1920 x 1080, 30 fps.

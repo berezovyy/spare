@@ -28,3 +28,11 @@ build to something bigger, for example the rows landing on the beat grid.
   lands at 6.0 s. Still not heard by anyone.
 - README copies: `../demo.mp4` (the render) and `../demo.webp` (1280 wide, 25 fps, lossy q75,
   3.7 MB), made with `ffmpeg -vf fps=25,scale=1280:-2` and `img2webp -lossy -q 75 -m 6 -d 40`.
+
+## v2 — faster, harder (current)
+- 25.0 s render, 5.2 MB; README WebP 2.4 MB. Audio measured: −14.3 LUFS, true peak −1.0 dBTP, no
+  clipping. Still not heard.
+- Fixed after looking at the render: the glass palette went grey on the ink field (Delete is on
+  white now); the icon landed before the violet flood had filled the frame (flood now ends on the
+  downbeat).
+- Kept on purpose: many `line_unread` warnings in the montage; the user asked for faster.

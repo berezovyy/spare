@@ -2,6 +2,7 @@
   <link rel="stylesheet" href="assets/spare.css" />
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; }
+    #c-stage { position: absolute; inset: 0; z-index: 20; }
     #c-pal { left: 700px; top: 150px; }
     .lst { position: absolute; left: 0; right: 0; top: 0; }
     #c-sel { top: 2px; }
@@ -18,23 +19,24 @@
     .ck { width: 34px; color: rgba(0,0,0,.6); }
     #mi-hi { position: absolute; left: 10px; right: 10px; top: 10px; height: 50px; border-radius: 12px; background: #5a4ffd; opacity: 0; }
   </style>
-  <div id="root" data-composition-id="chords" data-width="1920" data-height="1080" data-duration="10">
-    <div id="cf0" class="field f-violet clip" data-start="0" data-duration="2" data-track-index="0"></div>
-    <div id="cb0" class="clip" data-start="0" data-duration="2" data-track-index="1" style="position:absolute;inset:0"><div class="cap sm" id="k00" style="left:140px;top:300px">⌘</div><div class="type" id="cl0" style="left:140px;top:600px;font-size:120px;color:#ffffff">Hold ⌘</div></div>
-    <div id="cf1" class="field f-white clip" data-start="2" data-duration="2" data-track-index="0"></div>
-    <div id="cb1" class="clip" data-start="2" data-duration="2" data-track-index="1" style="position:absolute;inset:0"><div class="cap sm" id="k10" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k11" style="left:390px;top:300px">P</div><div class="type" id="cl1" style="left:140px;top:600px;font-size:120px;color:#0e0c1f">Pin</div></div>
-    <div id="cf2" class="field f-deep clip" data-start="4" data-duration="2" data-track-index="0"></div>
-    <div id="cb2" class="clip" data-start="4" data-duration="2" data-track-index="1" style="position:absolute;inset:0"><div class="cap sm" id="k20" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k21" style="left:390px;top:300px">F</div><div class="type" id="cl2" style="left:140px;top:600px;font-size:120px;color:#ffffff">Filter</div></div>
-    <div id="cf3" class="field f-white clip" data-start="6" data-duration="2" data-track-index="0"></div>
-    <div id="cb3" class="clip" data-start="6" data-duration="2" data-track-index="1" style="position:absolute;inset:0"><div class="cap sm" id="k30" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k31" style="left:390px;top:300px">⌫</div><div class="type" id="cl3" style="left:140px;top:600px;font-size:120px;color:#0e0c1f">Delete</div></div>
-    <div id="cf4" class="field f-violet clip" data-start="8" data-duration="2" data-track-index="0"></div>
-    <div id="cb4" class="clip" data-start="8" data-duration="2" data-track-index="1" style="position:absolute;inset:0"><div class="cap sm" id="k40" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k41" style="left:390px;top:300px">Z</div><div class="type" id="cl4" style="left:140px;top:600px;font-size:120px;color:#ffffff">Undo</div></div>
+  <div id="root" data-composition-id="chords" data-width="1920" data-height="1080" data-duration="5">
+    <div id="cf0" class="field f-violet clip" data-start="0" data-duration="1.2" data-track-index="0" style="z-index:0"></div>
+    <div id="cb0" class="clip" data-start="0" data-duration="1" data-track-index="1" style="position:absolute;inset:0;z-index:10;perspective:1200px"><div class="cap sm" id="k00" style="left:140px;top:300px">⌘</div><div class="type" id="cl0" style="left:140px;top:600px;font-size:130px;color:#ffffff">Hold ⌘</div></div>
+    <div id="cf1" class="field f-white clip" data-start="1" data-duration="1.2" data-track-index="0" style="z-index:1"></div>
+    <div id="cb1" class="clip" data-start="1" data-duration="1" data-track-index="1" style="position:absolute;inset:0;z-index:10;perspective:1200px"><div class="cap sm" id="k10" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k11" style="left:390px;top:300px">P</div><div class="type" id="cl1" style="left:140px;top:600px;font-size:130px;color:#0e0c1f">Pin</div></div>
+    <div id="cf2" class="field f-deep clip" data-start="2" data-duration="1.2" data-track-index="0" style="z-index:2"></div>
+    <div id="cb2" class="clip" data-start="2" data-duration="1" data-track-index="1" style="position:absolute;inset:0;z-index:10;perspective:1200px"><div class="cap sm" id="k20" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k21" style="left:390px;top:300px">F</div><div class="type" id="cl2" style="left:140px;top:600px;font-size:130px;color:#ffffff">Filter</div></div>
+    <div id="cf3" class="field f-white clip" data-start="3" data-duration="1.2" data-track-index="0" style="z-index:3"></div>
+    <div id="cb3" class="clip" data-start="3" data-duration="1" data-track-index="1" style="position:absolute;inset:0;z-index:10;perspective:1200px"><div class="cap sm" id="k30" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k31" style="left:390px;top:300px">⌫</div><div class="type" id="cl3" style="left:140px;top:600px;font-size:130px;color:#0e0c1f">Delete</div></div>
+    <div id="cf4" class="field f-violet clip" data-start="4" data-duration="1" data-track-index="0" style="z-index:4"></div>
+    <div id="cb4" class="clip" data-start="4" data-duration="1" data-track-index="1" style="position:absolute;inset:0;z-index:10;perspective:1200px"><div class="cap sm" id="k40" style="left:140px;top:300px">⌘</div><div class="cap sm" id="k41" style="left:390px;top:300px">Z</div><div class="type" id="cl4" style="left:140px;top:600px;font-size:130px;color:#ffffff">Undo</div></div>
+    <div id="c-stage">
     <div id="c-pal" class="palette">
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="ph">Search</span></div>
       <div class="tag" id="c-tag">Images <span style="color:rgba(0,0,0,.5)">×</span></div>
       <div class="list">
         <div class="sel" id="c-sel"></div>
-        <div class="lst" id="c-ld"><div class="row" id="d1" style="top:0px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">STAGING_API_KEY=sk_test_51NzQ8vK2xR</div><div class="tr"><span class="meta" id="d1-meta">Terminal · now</span><span class="chip" id="d1-ret">↵</span><span class="chip" id="d1-num">⌘1</span></div></div><div class="row" id="d2" style="top:72px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></div><div class="t">github.com/apple/swift-format</div><div class="tr"><span class="meta" id="d2-meta">Safari · 2m</span><span class="chip" id="d2-ret">↵</span><span class="chip" id="d2-num">⌘2</span></div></div><div class="row" id="d3" style="top:144px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">Meeting moved to 3:30, same room</div><div class="tr"><span id="d3-pin"><svg class="pin" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 2.5 21.5 8.5l-2 1-3.5 3.5.5 4.5-1.5 1.5-4-4L5 21l-2 0 0-2 6-6-4-4L6.5 7.5l4.5.5L14.5 4.5z"/></svg></span><span class="meta" id="d3-meta">Mail · 9m</span><span class="chip" id="d3-ret">↵</span><span class="chip" id="d3-num">⌘3</span></div></div><div class="row" id="d4" style="top:216px;"><div class="ic img" style="background: linear-gradient(#8fc3ff 0 55%, #3f8f5a 55% 100%);"></div><div class="t">Image</div><div class="tr"><span class="meta" id="d4-meta">Preview · 1h</span><span class="chip" id="d4-ret">↵</span><span class="chip" id="d4-num">⌘4</span></div></div><div class="row" id="d5" style="top:288px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.6 7.2"/></svg></div><div class="t">ana@studio.dev</div><div class="tr"><span class="meta" id="d5-meta">Mail · 1h</span><span class="chip" id="d5-ret">↵</span><span class="chip" id="d5-num">⌘5</span></div></div><div class="row" id="d6" style="top:360px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">git rebase -i HEAD~3</div><div class="tr"><span class="meta" id="d6-meta">Terminal · 2h</span><span class="chip" id="d6-ret">↵</span><span class="chip" id="d6-num">⌘6</span></div></div><div class="row" id="d7" style="top:432px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">#5A4FFD</div><div class="tr"><span class="meta" id="d7-meta">Figma · 3h</span><span class="chip" id="d7-ret">↵</span><span class="chip" id="d7-num">⌘7</span></div></div><div class="row" id="d8" style="top:504px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></div><div class="t">developer.apple.com/documentation/appkit</div><div class="tr"><span class="meta" id="d8-meta">Safari · 3h</span><span class="chip" id="d8-ret">↵</span><span class="chip" id="d8-num">⌘8</span></div></div></div>
+        <div class="lst" id="c-ld"><div class="row" id="d1" style="top:0px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">Flight to Lisbon · booking KX7Q2M</div><div class="tr"><span class="meta" id="d1-meta">Mail · now</span><span class="chip" id="d1-ret">↵</span><span class="chip" id="d1-num">⌘1</span></div></div><div class="row" id="d2" style="top:72px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></div><div class="t">github.com/apple/swift-format</div><div class="tr"><span class="meta" id="d2-meta">Safari · 2m</span><span class="chip" id="d2-ret">↵</span><span class="chip" id="d2-num">⌘2</span></div></div><div class="row" id="d3" style="top:144px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">Meeting moved to 3:30, same room</div><div class="tr"><span id="d3-pin"><svg class="pin" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 2.5 21.5 8.5l-2 1-3.5 3.5.5 4.5-1.5 1.5-4-4L5 21l-2 0 0-2 6-6-4-4L6.5 7.5l4.5.5L14.5 4.5z"/></svg></span><span class="meta" id="d3-meta">Mail · 9m</span><span class="chip" id="d3-ret">↵</span><span class="chip" id="d3-num">⌘3</span></div></div><div class="row" id="d4" style="top:216px;"><div class="ic img" style="background: linear-gradient(#8fc3ff 0 55%, #3f8f5a 55% 100%);"></div><div class="t">Image</div><div class="tr"><span class="meta" id="d4-meta">Preview · 1h</span><span class="chip" id="d4-ret">↵</span><span class="chip" id="d4-num">⌘4</span></div></div><div class="row" id="d5" style="top:288px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.6 7.2"/></svg></div><div class="t">ana@studio.dev</div><div class="tr"><span class="meta" id="d5-meta">Mail · 1h</span><span class="chip" id="d5-ret">↵</span><span class="chip" id="d5-num">⌘5</span></div></div><div class="row" id="d6" style="top:360px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">git rebase -i HEAD~3</div><div class="tr"><span class="meta" id="d6-meta">Terminal · 2h</span><span class="chip" id="d6-ret">↵</span><span class="chip" id="d6-num">⌘6</span></div></div><div class="row" id="d7" style="top:432px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">#5A4FFD</div><div class="tr"><span class="meta" id="d7-meta">Figma · 3h</span><span class="chip" id="d7-ret">↵</span><span class="chip" id="d7-num">⌘7</span></div></div><div class="row" id="d8" style="top:504px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></div><div class="t">developer.apple.com/documentation/appkit</div><div class="tr"><span class="meta" id="d8-meta">Safari · 3h</span><span class="chip" id="d8-ret">↵</span><span class="chip" id="d8-num">⌘8</span></div></div></div>
         <div class="lst" id="c-le" style="opacity:0"><div class="row" id="e1" style="top:0px;"><div class="ic img" style="background: linear-gradient(#8fc3ff 0 55%, #3f8f5a 55% 100%);"></div><div class="t">Image</div><div class="tr"><span class="meta" id="e1-meta">Preview · 1h</span><span class="chip" id="e1-ret">↵</span></div></div><div class="row" id="e2" style="top:72px;"><div class="ic img" style="background: #f2f2f7; box-shadow: inset 0 0 0 2px #d9d9e3, inset 0 10px 0 2px #e4e2ff;"></div><div class="t">Image</div><div class="tr"><span class="meta" id="e2-meta">Safari · 1d</span><span class="chip" id="e2-ret">↵</span></div></div><div class="row" id="e3" style="top:144px;"><div class="ic img" style="background: radial-gradient(circle at 35% 40%, #ffb35c 0 30%, #ff6b5c 31% 100%);"></div><div class="t">Image</div><div class="tr"><span class="meta" id="e3-meta">Photos · 2d</span><span class="chip" id="e3-ret">↵</span></div></div></div>
       </div>
       <div id="c-menu"><div id="mi-hi"></div><div style="position:relative"><div class="mi" id="mi0"><span class="ck">✓</span>All</div><div class="mi" id="mi1"><span class="ck"></span>Text</div><div class="mi" id="mi2"><span class="ck"></span>Images</div><div class="mi" id="mi3"><span class="ck"></span>Links</div><div class="mi" id="mi4"><span class="ck"></span>Emails</div></div></div>
@@ -45,6 +47,7 @@
       <span class="h"><span class="chip">⌘F</span>Filter</span>
     </div>
     <div class="capsule" id="c-toast"><span style="color:#000">Deleted</span><span class="h"><span class="chip">⌘Z</span>Undo</span></div>
+    </div>
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });
@@ -52,54 +55,62 @@
     const capUp = "0 18px 0 #c9c4ff, 0 34px 60px rgba(14, 12, 31, 0.28)";
     // A key press: down in 4 frames, back in 6.
     const press = (sel, at) => {
-      tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.13, ease: "expo.out" }, at);
-      tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.2, ease: "power2.out" }, at + 0.13);
+      tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.08, ease: "expo.out" }, at);
+      tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.14, ease: "power2.out" }, at + 0.08);
     };
+    // An impact: the whole stage kicks and settles in 7 frames.
+    const shake = (sel, at, a = 16) =>
+      tl.to(sel, { keyframes: { x: [0, -a, a * 0.8, -a * 0.5, a * 0.25, 0], y: [0, a * 0.5, -a * 0.4, a * 0.2, 0, 0] }, duration: 0.24, ease: "none" }, at);
     // A word or line arriving: blur 6 -> 0 and opacity in 4 frames, no translate.
     const blurIn = (sel, at, d = 0.13) =>
       tl.fromTo(sel, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: d, ease: "power2.out" }, at);
     const show = (sel, at) => tl.set(sel, { opacity: 1 }, at);
     const hide = (sel, at) => tl.set(sel, { opacity: 0 }, at);
+    // Each field wipes in from the left over the last one, on the beat.
+    [1, 2, 3, 4].forEach((b) => tl.fromTo("#cf" + b, { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.16, ease: "power3.out" }, b));
+    // The palette whips in from the right on the first beat.
+    tl.fromTo("#c-pal", { x: 900, filter: "blur(10px)" }, { x: 0, filter: "blur(0px)", duration: 0.28, ease: "expo.out" }, 0);
     const slam = (b, n) => {
       const caps = Array.from({ length: n }, (_, j) => "#k" + b + j);
-      tl.fromTo(caps, { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.2, ease: "expo.out", stagger: 0.05 }, 2 * b);
-      blurIn("#cl" + b, 2 * b + 0.12, 0.16);
-      caps.forEach((c) => press(c, 2 * b + 0.5));
+      tl.fromTo(caps, { opacity: 0, y: -120, rotationX: 50, scale: 1.3, filter: "blur(10px)" }, { opacity: 1, y: 0, rotationX: 0, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out", stagger: 0.04 }, b);
+      tl.fromTo("#cl" + b, { opacity: 0, filter: "blur(8px)", scale: 1.06 }, { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.12, ease: "expo.out", transformOrigin: "0% 50%" }, b + 0.06);
+      caps.forEach((c) => press(c, b + 0.25));
+      shake("#c-stage", b + 0.25, 7);
     };
     [1, 2, 2, 2, 2].forEach((n, b) => slam(b, n));
-    const glide = (y, at) => tl.to("#c-sel", { y, duration: 0.2, ease: "cubic-bezier(.22,1,.36,1)" }, at);
-    // Bar 1: hold ⌘ - after 0.35 s the rows show their numbers and the hints float in.
-    hide("#d1-meta", 0.85); hide("#d1-ret", 0.85);
-    tl.to(["#d1-num", "#d2-num", "#d3-num", "#d4-num", "#d5-num", "#d6-num", "#d7-num", "#d8-num"], { opacity: 1, duration: 0.15, stagger: 0.02 }, 0.85);
-    tl.fromTo("#c-hints", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "power2.out" }, 0.85);
-    tl.to(["#d1-num", "#d2-num", "#d3-num", "#d4-num", "#d5-num", "#d6-num", "#d7-num", "#d8-num"], { opacity: 0, duration: 0.15 }, 1.85);
-    tl.to("#c-hints", { opacity: 0, duration: 0.15, ease: "power3.in" }, 1.85);
-    show("#d1-meta", 1.9); show("#d1-ret", 1.9);
-    // Bar 2: down twice to the meeting, ⌘P - it leads the list with a pin.
-    hide("#d1-meta", 2.1); hide("#d1-ret", 2.1); glide(72, 2.1); show("#d2-meta", 2.1); show("#d2-ret", 2.1);
-    hide("#d2-meta", 2.3); hide("#d2-ret", 2.3); glide(144, 2.3); show("#d3-meta", 2.3); show("#d3-ret", 2.3);
-    tl.to("#d3", { y: -144, duration: 0.25, ease: "power3.out" }, 2.5);
-    tl.to(["#d1", "#d2"], { y: 72, duration: 0.25, ease: "power3.out" }, 2.5);
-    glide(0, 2.5);
-    tl.fromTo("#d3-pin", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 2.55);
-    // Bar 3: ⌘F opens the filter menu; Images.
-    tl.fromTo("#c-menu", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.14, ease: "power2.out" }, 4.52);
-    tl.set("#mi-hi", { opacity: 1, y: 0 }, 4.6);
-    tl.set("#mi0", { color: "#ffffff" }, 4.6);
-    tl.set("#mi0", { color: "#000000" }, 4.8);
-    tl.to("#mi-hi", { y: 100, duration: 0.12, ease: "power2.out" }, 4.8);
-    tl.set("#mi2", { color: "#ffffff" }, 4.8);
-    tl.to("#c-menu", { opacity: 0, duration: 0.1 }, 5.0);
-    hide("#c-ld", 5.05); show("#c-le", 5.05);
-    tl.fromTo("#c-tag", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.8)" }, 5.05);
-    // Bar 4: ⌘⌫ - the image goes, the toast offers ⌘Z.
-    tl.to("#e1", { opacity: 0, scaleY: 0.6, duration: 0.15, ease: "power3.in" }, 6.5);
-    tl.to(["#e2", "#e3"], { y: -72, duration: 0.2, ease: "power3.out" }, 6.58);
-    tl.fromTo("#c-toast", { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "power2.out" }, 6.55);
-    // Bar 5: ⌘Z - it comes back where it was.
-    tl.to(["#e2", "#e3"], { y: 0, duration: 0.2, ease: "power3.out" }, 8.5);
-    tl.to("#e1", { opacity: 1, scaleY: 1, duration: 0.2, ease: "power3.out" }, 8.55);
-    tl.to("#c-toast", { opacity: 0, duration: 0.12, ease: "power3.in" }, 8.6);
+    const glide = (y, at) => tl.to("#c-sel", { y, duration: 0.12, ease: "cubic-bezier(.22,1,.36,1)" }, at);
+    const nums = ["#d1-num", "#d2-num", "#d3-num", "#d4-num", "#d5-num", "#d6-num", "#d7-num", "#d8-num"];
+    // Hold ⌘: after the app's 0.35 s the rows show their numbers and the hints float in.
+    hide("#d1-meta", 0.5); hide("#d1-ret", 0.5);
+    tl.to(nums, { opacity: 1, duration: 0.12, stagger: 0.015 }, 0.5);
+    tl.fromTo("#c-hints", { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "power2.out" }, 0.5);
+    tl.to(nums, { opacity: 0, duration: 0.08 }, 0.94);
+    tl.to("#c-hints", { opacity: 0, duration: 0.08, ease: "power3.in" }, 0.94);
+    // ⌘P: down twice to the meeting, and it leads the list with a pin.
+    glide(72, 1.02); show("#d2-meta", 1.02); show("#d2-ret", 1.02);
+    hide("#d2-meta", 1.12); hide("#d2-ret", 1.12); glide(144, 1.12); show("#d3-meta", 1.12); show("#d3-ret", 1.12);
+    tl.to("#d3", { y: -144, duration: 0.2, ease: "power3.out" }, 1.25);
+    tl.to(["#d1", "#d2"], { y: 72, duration: 0.2, ease: "power3.out" }, 1.25);
+    glide(0, 1.25);
+    tl.fromTo("#d3-pin", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(2)" }, 1.28);
+    // ⌘F: the filter menu, Images.
+    tl.fromTo("#c-menu", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.1, ease: "power2.out" }, 2.26);
+    tl.set("#mi-hi", { opacity: 1, y: 0 }, 2.3);
+    tl.set("#mi0", { color: "#ffffff" }, 2.3);
+    tl.set("#mi0", { color: "#000000" }, 2.45);
+    tl.to("#mi-hi", { y: 100, duration: 0.08, ease: "power2.out" }, 2.45);
+    tl.set("#mi2", { color: "#ffffff" }, 2.45);
+    tl.to("#c-menu", { opacity: 0, duration: 0.08 }, 2.6);
+    hide("#c-ld", 2.62); show("#c-le", 2.62);
+    tl.fromTo("#c-tag", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(1.8)" }, 2.62);
+    // ⌘⌫: the image goes and the toast offers ⌘Z.
+    tl.to("#e1", { opacity: 0, scaleY: 0.6, duration: 0.12, ease: "power3.in" }, 3.25);
+    tl.to(["#e2", "#e3"], { y: -72, duration: 0.16, ease: "power3.out" }, 3.31);
+    tl.fromTo("#c-toast", { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "power2.out" }, 3.3);
+    // ⌘Z: it comes back where it was.
+    tl.to(["#e2", "#e3"], { y: 0, duration: 0.16, ease: "power3.out" }, 4.25);
+    tl.to("#e1", { opacity: 1, scaleY: 1, duration: 0.16, ease: "power3.out" }, 4.29);
+    tl.to("#c-toast", { opacity: 0, duration: 0.1, ease: "power3.in" }, 4.33);
     window.__timelines["chords"] = tl;
   </script>
 </template>

@@ -2,21 +2,21 @@
   <link rel="stylesheet" href="assets/spare.css" />
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; }
-    .big { left: 160px; top: 250px; font-size: 300px; }
-    .sub { position: absolute; left: 168px; top: 640px; font-family: "SF"; font-size: 56px; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; }
-    #n3 { font-size: 520px; top: 120px; color: #5a4ffd; }
-    #n3s { top: 690px; }
+    .big { left: 150px; top: 230px; font-size: 360px; }
+    .sub { position: absolute; left: 164px; top: 680px; font-family: "SF"; font-size: 64px; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; }
+    #n3 { font-size: 640px; top: 40px; color: #5a4ffd; }
+    #n3s { top: 720px; }
   </style>
-  <div id="root" data-composition-id="numbers" data-width="1920" data-height="1080" data-duration="6">
-    <div id="nf1" class="field f-violet clip" data-start="0" data-duration="2" data-track-index="0"></div>
-    <div id="nf2" class="field f-white clip" data-start="2" data-duration="2" data-track-index="0"></div>
-    <div id="nf3" class="field f-ink clip" data-start="4" data-duration="2" data-track-index="0"></div>
-    <div id="n1" class="type big clip" data-start="0" data-duration="2" data-track-index="1" style="color:#fff">&lt; 25 MB</div>
-    <div id="n1s" class="sub clip" data-start="0" data-duration="2" data-track-index="2" style="color:#fff"><span class="w" id="n1w0">in</span> <span class="w" id="n1w1">memory,</span> <span class="w" id="n1w2">with</span> <span class="w" id="n1w3">1,000</span> <span class="w" id="n1w4">clips</span></div>
-    <div id="n2" class="type big clip" data-start="2" data-duration="2" data-track-index="1" style="color:#0e0c1f"><span class="w" id="n2c0">&lt;</span><span class="w" id="n2c1">&nbsp;</span><span class="w" id="n2c2">0</span><span class="w" id="n2c3">.</span><span class="w" id="n2c4">0</span><span class="w" id="n2c5">5</span><span class="w" id="n2c6">%</span></div>
-    <div id="n2s" class="sub clip" data-start="2" data-duration="2" data-track-index="2" style="color:#0e0c1f"><span class="w" id="n2w0">CPU</span> <span class="w" id="n2w1">while</span> <span class="w" id="n2w2">it</span> <span class="w" id="n2w3">waits</span></div>
-    <div id="n3" class="type big clip" data-start="4" data-duration="2" data-track-index="1">0</div>
-    <div id="n3s" class="sub clip" data-start="4" data-duration="2" data-track-index="2" style="color:#fff"><span class="w" id="n3w0">network</span> <span class="w" id="n3w1">connections</span></div>
+  <div id="root" data-composition-id="numbers" data-width="1920" data-height="1080" data-duration="3">
+    <div id="nf1" class="field f-violet clip" data-start="0" data-duration="1" data-track-index="0"></div>
+    <div id="nf2" class="field f-white clip" data-start="1" data-duration="1" data-track-index="0"></div>
+    <div id="nf3" class="field f-ink clip" data-start="2" data-duration="1" data-track-index="0"></div>
+    <div id="n1" class="type big clip" data-start="0" data-duration="1" data-track-index="1" style="color:#fff">&lt; <span id="n1v">0</span> MB</div>
+    <div id="n1s" class="sub clip" data-start="0" data-duration="1" data-track-index="2" style="color:#fff"><span class="w" id="n1w0">of</span> <span class="w" id="n1w1">memory</span></div>
+    <div id="n2" class="type big clip" data-start="1" data-duration="1" data-track-index="1" style="color:#0e0c1f"><span class="w" id="n2c0">&lt;</span><span class="w" id="n2c1">&nbsp;</span><span class="w" id="n2c2">0</span><span class="w" id="n2c3">.</span><span class="w" id="n2c4">0</span><span class="w" id="n2c5">5</span><span class="w" id="n2c6">%</span></div>
+    <div id="n2s" class="sub clip" data-start="1" data-duration="1" data-track-index="2" style="color:#0e0c1f"><span class="w" id="n2w0">CPU</span> <span class="w" id="n2w1">at</span> <span class="w" id="n2w2">rest</span></div>
+    <div id="n3" class="type big clip" data-start="2" data-duration="1" data-track-index="1">0</div>
+    <div id="n3s" class="sub clip" data-start="2" data-duration="1" data-track-index="2" style="color:#fff"><span class="w" id="n3w0">network</span> <span class="w" id="n3w1">connections</span></div>
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });
@@ -24,21 +24,27 @@
     const capUp = "0 18px 0 #c9c4ff, 0 34px 60px rgba(14, 12, 31, 0.28)";
     // A key press: down in 4 frames, back in 6.
     const press = (sel, at) => {
-      tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.13, ease: "expo.out" }, at);
-      tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.2, ease: "power2.out" }, at + 0.13);
+      tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.08, ease: "expo.out" }, at);
+      tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.14, ease: "power2.out" }, at + 0.08);
     };
+    // An impact: the whole stage kicks and settles in 7 frames.
+    const shake = (sel, at, a = 16) =>
+      tl.to(sel, { keyframes: { x: [0, -a, a * 0.8, -a * 0.5, a * 0.25, 0], y: [0, a * 0.5, -a * 0.4, a * 0.2, 0, 0] }, duration: 0.24, ease: "none" }, at);
     // A word or line arriving: blur 6 -> 0 and opacity in 4 frames, no translate.
     const blurIn = (sel, at, d = 0.13) =>
       tl.fromTo(sel, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: d, ease: "power2.out" }, at);
     const show = (sel, at) => tl.set(sel, { opacity: 1 }, at);
     const hide = (sel, at) => tl.set(sel, { opacity: 0 }, at);
-    // Three entrances: a slam, letters typed in, a zoom slam.
-    tl.fromTo("#n1", { scale: 1.08, filter: "blur(10px)", opacity: 0 }, { scale: 1, filter: "blur(0px)", opacity: 1, duration: 0.14, ease: "expo.out", transformOrigin: "0% 50%" }, 0);
-    [0, 1, 2, 3, 4].forEach((i) => blurIn("#n1w" + i, 0.25 + 0.08 * i));
-    [0, 1, 2, 3, 4, 5, 6].forEach((i) => blurIn("#n2c" + i, 2 + 0.034 * i, 0.1));
-    [0, 1, 2, 3].forEach((i) => blurIn("#n2w" + i, 2.3 + 0.08 * i));
-    tl.fromTo("#n3", { scale: 3, opacity: 0, filter: "blur(14px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.22, ease: "expo.out", transformOrigin: "20% 55%" }, 4);
-    [0, 1].forEach((i) => blurIn("#n3w" + i, 4.3 + 0.08 * i));
+    // A count-up slam, letters typed in on frames, a zoom slam.
+    tl.fromTo("#n1", { scale: 1.12, filter: "blur(12px)", opacity: 0 }, { scale: 1, filter: "blur(0px)", opacity: 1, duration: 0.12, ease: "expo.out", transformOrigin: "0% 50%" }, 0);
+    const mb = { v: 0 };
+    tl.to(mb, { v: 25, duration: 0.3, ease: "power2.out", onUpdate: () => { document.querySelector("#n1v").textContent = String(Math.round(mb.v)); } }, 0);
+    [0, 1].forEach((i) => blurIn("#n1w" + i, 0.12 + 0.06 * i, 0.1));
+    [0, 1, 2, 3, 4, 5, 6].forEach((i) => blurIn("#n2c" + i, 1 + 0.033 * i, 0.08));
+    [0, 1, 2].forEach((i) => blurIn("#n2w" + i, 1.2 + 0.06 * i, 0.1));
+    tl.fromTo("#n3", { scale: 3.2, opacity: 0, filter: "blur(16px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out", transformOrigin: "20% 55%" }, 2);
+    shake("#n3", 2.18, 14);
+    [0, 1].forEach((i) => blurIn("#n3w" + i, 2.2 + 0.06 * i, 0.1));
     window.__timelines["numbers"] = tl;
   </script>
 </template>

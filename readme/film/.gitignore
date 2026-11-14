@@ -6,3 +6,5 @@ assets/sfx/
 renders/
 .hyperframes/
 node_modules/
+.thumbnails/
+.waveform-cache/
