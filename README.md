@@ -6,7 +6,8 @@
 
 <p align="center">
   <strong>Everything you copied, one keystroke away.</strong><br />
-  A clipboard history for macOS that stays out of the way.
+  A fast, private <strong>clipboard manager for macOS</strong>: searchable clipboard history for
+  text, images and links, pasted with the keyboard.
 </p>
 
 <p align="center">
@@ -24,17 +25,33 @@
   <sub><a href="readme/demo.mp4">Watch with sound</a> · music: “Electro Dreams” by Arulo (Mixkit)</sub>
 </p>
 
-Press **⌘⇧V**, type a few letters of something you copied earlier, press Return, and it is pasted
-where you were typing.
+Spare keeps a history of everything you copy on your Mac. Press **⌘⇧V**, type a few letters of
+something you copied earlier, press Return, and it is pasted where you were typing.
 
-Text and images, pinned favourites, type filters. Swift and AppKit, no dependencies, under 1 MB of
-code. Everything stays on your Mac.
+It is a native macOS menu bar app written in Swift and AppKit, with no dependencies, under 1 MB of
+code, and no network access: your clipboard history never leaves your Mac.
+
+## Features
+
+- **Searchable clipboard history.** Type any words in any order; a thousand clips are searched in
+  a few milliseconds, as you type.
+- **Paste anywhere.** Return pastes straight into the app you were typing in; ⌘1–⌘9 paste the
+  first nine clips without choosing.
+- **Text, images, links and email addresses**, each with its own filter (⌘F).
+- **Pinned clips** stay at the top and are never cleared.
+- **Delete and undo.** ⌘⌫ removes a clip, ⌘Z brings it back.
+- **Private by design.** Stored only on your Mac, no network connections, and passwords copied
+  from password managers are never recorded.
+- **Light.** Under 25 MB of memory and under 0.05% CPU while it waits.
+- **Native on macOS 26 Tahoe**, with Liquid Glass, light and dark mode, a hotkey you can change,
+  and launch at login.
 
 ## Install
 
 Requires macOS 26 (Tahoe) or later, Apple silicon or Intel.
 
-1. Download `Spare-<version>.dmg` and open it.
+1. Download `Spare-<version>.dmg` from [Releases](https://github.com/berezovyy/spare/releases/latest)
+   and open it.
 2. Drag **Spare** into **Applications**, then open it from there.
 3. Spare isn't notarized by Apple, so macOS refuses it the first time. Open **System Settings ›
    Privacy & Security**, scroll down to the message about Spare and click **Open Anyway**. This
@@ -70,6 +87,20 @@ finds clips by kind as well as by content.
   [nspasteboard.org](http://nspasteboard.org) convention.
 - Clips older than a month are removed by default; Settings offers a week, three months or never.
   **Reset Database…** deletes everything.
+
+## FAQ
+
+**Is Spare free?** Yes. It is free and open source under the GNU AGPL v3.
+
+**Does it sync between Macs or upload anything?** No. Spare makes no network connections; the
+history lives in one folder on your Mac.
+
+**Does it record passwords?** No. Copies that apps mark as concealed or transient, which is what
+password managers do, are skipped.
+
+**Which Macs does it run on?** macOS 26 (Tahoe) or later, on Apple silicon and Intel.
+
+**Can I change the shortcut?** Yes, in Settings. ⌘⇧V is the default.
 
 ## Uninstall
 
