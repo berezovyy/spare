@@ -27,9 +27,12 @@
       tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.08, ease: "expo.out" }, at);
       tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.14, ease: "power2.out" }, at + 0.08);
     };
-    // An impact: the whole stage kicks and settles in 7 frames.
-    const shake = (sel, at, a = 16) =>
-      tl.to(sel, { keyframes: { x: [0, -a, a * 0.8, -a * 0.5, a * 0.25, 0], y: [0, a * 0.5, -a * 0.4, a * 0.2, 0, 0] }, duration: 0.24, ease: "none" }, at);
+    // An impact: a zoom punch that settles smoothly (no frame-to-frame jitter).
+    const punch = (sel, at, s = 1.03) =>
+      tl.fromTo(sel, { scale: s }, { scale: 1, duration: 0.32, ease: "power3.out", immediateRender: false }, at);
+    // One real shake, reserved for the drop: two slow swings, eased.
+    const shake = (sel, at, a = 12) =>
+      tl.to(sel, { keyframes: { x: [0, -a, a * 0.6, -a * 0.25, 0], ease: "sine.inOut" }, duration: 0.36, ease: "none" }, at);
     // A word or line arriving: blur 6 -> 0 and opacity in 4 frames, no translate.
     const blurIn = (sel, at, d = 0.13) =>
       tl.fromTo(sel, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: d, ease: "power2.out" }, at);
@@ -42,8 +45,8 @@
     [0, 1].forEach((i) => blurIn("#n1w" + i, 0.12 + 0.06 * i, 0.1));
     [0, 1, 2, 3, 4, 5, 6].forEach((i) => blurIn("#n2c" + i, 1 + 0.033 * i, 0.08));
     [0, 1, 2].forEach((i) => blurIn("#n2w" + i, 1.2 + 0.06 * i, 0.1));
-    tl.fromTo("#n3", { scale: 3.2, opacity: 0, filter: "blur(16px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out", transformOrigin: "20% 55%" }, 2);
-    shake("#n3", 2.18, 14);
+    tl.fromTo("#n3", { scale: 3.2, opacity: 0, filter: "blur(16px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.26, ease: "power3.out", transformOrigin: "20% 55%" }, 2);
+    
     [0, 1].forEach((i) => blurIn("#n3w" + i, 2.2 + 0.06 * i, 0.1));
     window.__timelines["numbers"] = tl;
   </script>

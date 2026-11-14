@@ -36,3 +36,19 @@ build to something bigger, for example the rows landing on the beat grid.
   white now); the icon landed before the violet flood had filled the frame (flood now ends on the
   downbeat).
 - Kept on purpose: many `line_unread` warnings in the montage; the user asked for faster.
+
+## v2.1 — smoothness (current)
+Report: "not so smooth, feels laggy". Measured on the history stream, which moves at a constant
+1020 px/s:
+- README WebP (25 fps made from a 30 fps render): steps of 32–36 px with a 68 px double step every
+  5th frame, a 5 Hz judder. Cause: 30 → 25 fps drops one frame in six.
+- MP4 at 30 fps: even 32–36 px steps, no frozen frames in motion.
+Fixes:
+- Render at 60 fps (`render --fps 60`): even 16 px steps, 1,500 frames, no frozen frame in motion
+  except two deliberate holds (2.98 s before the drop, 4.6 s before the paste).
+- WebP at exactly 30 fps from every second frame, delays 33/33/34 ms: even 32–36 px steps,
+  24.97 s, 2.8 MB.
+- Eight jittery x/y shakes became smooth zoom punches (scale 1.015–1.04 → 1, 0.32 s power3.out);
+  one eased shake stays on the drop. The biggest expo.out moves (palette whip, key drops, number
+  zoom, icon slam) became power3.out at 0.24–0.38 s, so no move covers most of its travel in one
+  frame.

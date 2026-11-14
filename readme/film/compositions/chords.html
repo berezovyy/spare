@@ -58,9 +58,12 @@
       tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.08, ease: "expo.out" }, at);
       tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.14, ease: "power2.out" }, at + 0.08);
     };
-    // An impact: the whole stage kicks and settles in 7 frames.
-    const shake = (sel, at, a = 16) =>
-      tl.to(sel, { keyframes: { x: [0, -a, a * 0.8, -a * 0.5, a * 0.25, 0], y: [0, a * 0.5, -a * 0.4, a * 0.2, 0, 0] }, duration: 0.24, ease: "none" }, at);
+    // An impact: a zoom punch that settles smoothly (no frame-to-frame jitter).
+    const punch = (sel, at, s = 1.03) =>
+      tl.fromTo(sel, { scale: s }, { scale: 1, duration: 0.32, ease: "power3.out", immediateRender: false }, at);
+    // One real shake, reserved for the drop: two slow swings, eased.
+    const shake = (sel, at, a = 12) =>
+      tl.to(sel, { keyframes: { x: [0, -a, a * 0.6, -a * 0.25, 0], ease: "sine.inOut" }, duration: 0.36, ease: "none" }, at);
     // A word or line arriving: blur 6 -> 0 and opacity in 4 frames, no translate.
     const blurIn = (sel, at, d = 0.13) =>
       tl.fromTo(sel, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: d, ease: "power2.out" }, at);
@@ -69,13 +72,13 @@
     // Each field wipes in from the left over the last one, on the beat.
     [1, 2, 3, 4].forEach((b) => tl.fromTo("#cf" + b, { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.16, ease: "power3.out" }, b));
     // The palette whips in from the right on the first beat.
-    tl.fromTo("#c-pal", { x: 900, filter: "blur(10px)" }, { x: 0, filter: "blur(0px)", duration: 0.28, ease: "expo.out" }, 0);
+    tl.fromTo("#c-pal", { x: 900, filter: "blur(10px)" }, { x: 0, filter: "blur(0px)", duration: 0.36, ease: "power3.out" }, 0);
     const slam = (b, n) => {
       const caps = Array.from({ length: n }, (_, j) => "#k" + b + j);
-      tl.fromTo(caps, { opacity: 0, y: -120, rotationX: 50, scale: 1.3, filter: "blur(10px)" }, { opacity: 1, y: 0, rotationX: 0, scale: 1, filter: "blur(0px)", duration: 0.18, ease: "expo.out", stagger: 0.04 }, b);
+      tl.fromTo(caps, { opacity: 0, y: -120, rotationX: 50, scale: 1.3, filter: "blur(10px)" }, { opacity: 1, y: 0, rotationX: 0, scale: 1, filter: "blur(0px)", duration: 0.24, ease: "power3.out", stagger: 0.04 }, b);
       tl.fromTo("#cl" + b, { opacity: 0, filter: "blur(8px)", scale: 1.06 }, { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.12, ease: "expo.out", transformOrigin: "0% 50%" }, b + 0.06);
       caps.forEach((c) => press(c, b + 0.25));
-      shake("#c-stage", b + 0.25, 7);
+      punch("#c-stage", b + 0.25, 1.015);
     };
     [1, 2, 2, 2, 2].forEach((n, b) => slam(b, n));
     const glide = (y, at) => tl.to("#c-sel", { y, duration: 0.12, ease: "cubic-bezier(.22,1,.36,1)" }, at);
