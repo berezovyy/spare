@@ -1,0 +1,8 @@
+# Licensed files that may not be redistributed on their own: fetch-assets.sh puts them back.
+assets/fonts/
+assets/audio/
+assets/sfx/
+# Renders and HyperFrames' own state
+renders/
+.hyperframes/
+node_modules/

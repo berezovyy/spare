@@ -1,0 +1,60 @@
+<template>
+  <link rel="stylesheet" href="assets/spare.css" />
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #s-pal { left: 400px; top: 180px; }
+    .qc { display: none; }
+    .lst { position: absolute; left: 0; right: 0; top: 0; }
+    #s-flash { position: absolute; inset: 0; background: #ffffff; }
+    #s-msg { position: absolute; left: 210px; top: 470px; width: 1500px; height: 140px; border-radius: 40px; background: #ffffff;
+      box-shadow: 0 30px 70px rgba(20,10,80,.3); font-family: "SF"; font-size: 40px; color: #0e0c1f; display: flex; align-items: center; padding: 0 56px; white-space: nowrap; }
+    #s-paste { margin-left: 12px; font-weight: 500; border-radius: 10px; padding: 2px 6px; }
+    #s-caret2 { display: inline-block; width: 3px; height: 48px; background: #5a4ffd; margin-left: 4px; }
+  </style>
+  <div id="root" data-composition-id="search" data-width="1920" data-height="1080" data-duration="4">
+    <div id="s-ground" class="field f-violet clip" data-start="0" data-duration="4" data-track-index="0"></div>
+    <div id="s-msg" class="clip" data-start="2.55" data-duration="1.45" data-track-index="1"><span>Here’s the staging key:</span><span id="s-paste">STAGING_API_KEY=sk_test_51NzQ8vK2xR</span><span id="s-caret2"></span></div>
+    <div id="s-pal" class="palette clip" data-start="0" data-duration="2.75" data-track-index="2">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span id="s-ph" class="ph">Search</span><span class="q"><span class="qc" id="sq0">s</span><span class="qc" id="sq1">t</span><span class="qc" id="sq2">a</span><span class="qc" id="sq3">g</span><span class="qc" id="sq4">&nbsp;</span><span class="qc" id="sq5">k</span><span class="qc" id="sq6">e</span><span class="qc" id="sq7">y</span></span><span class="caret"></span></div>
+      <div class="list">
+        <div class="sel" style="top:2px"></div>
+        <div class="lst" id="s-la"><div class="row" id="sa1" style="top:0px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></div><div class="t">github.com/apple/swift-format</div><div class="tr"><span class="meta" id="sa1-meta">Safari · 2m</span><span class="chip" id="sa1-ret">↵</span></div></div><div class="row" id="sa2" style="top:72px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">Meeting moved to 3:30, same room</div></div><div class="row" id="sa3" style="top:144px;"><div class="ic img" style="background: linear-gradient(#8fc3ff 0 55%, #3f8f5a 55% 100%);"></div><div class="t">Image</div></div><div class="row" id="sa4" style="top:216px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.6 7.2"/></svg></div><div class="t">ana@studio.dev</div></div><div class="row" id="sa5" style="top:288px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">git rebase -i HEAD~3</div></div><div class="row" id="sa6" style="top:360px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">#5A4FFD</div></div><div class="row" id="sa7" style="top:432px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></div><div class="t">developer.apple.com/documentation/appkit</div></div><div class="row" id="sa8" style="top:504px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t">Flight LH 1491 · seat 14C</div></div></div>
+        <div class="lst" id="s-lb" style="opacity:0"><div class="row" id="sb1" style="top:0px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t"><b>Stag</b>ing deploy notes — Thursday</div><div class="tr"><span class="meta" id="sb1-meta">Notes · 1h</span><span class="chip" id="sb1-ret">↵</span></div></div><div class="row" id="sb2" style="top:72px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t"><b>STAG</b>ING_API_KEY=sk_test_51NzQ8vK2xR</div></div></div>
+        <div class="lst" id="s-lc" style="opacity:0"><div class="row" id="sc1" style="top:0px;"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4.5"/></svg></div><div class="t"><b>STAG</b>ING_API_<b>KEY</b>=sk_test_51NzQ8vK2xR</div><div class="tr"><span class="meta" id="sc1-meta">Terminal · 1h</span><span class="chip" id="sc1-ret">↵</span></div></div></div>
+      </div>
+    </div>
+    <div id="s-flash" class="clip" data-start="0" data-duration="0.5" data-track-index="3"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const capDown = "0 4px 0 #c9c4ff, 0 14px 30px rgba(14, 12, 31, 0.22)";
+    const capUp = "0 18px 0 #c9c4ff, 0 34px 60px rgba(14, 12, 31, 0.28)";
+    // A key press: down in 4 frames, back in 6.
+    const press = (sel, at) => {
+      tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.13, ease: "expo.out" }, at);
+      tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.2, ease: "power2.out" }, at + 0.13);
+    };
+    // A word or line arriving: blur 6 -> 0 and opacity in 4 frames, no translate.
+    const blurIn = (sel, at, d = 0.13) =>
+      tl.fromTo(sel, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: d, ease: "power2.out" }, at);
+    const show = (sel, at) => tl.set(sel, { opacity: 1 }, at);
+    const hide = (sel, at) => tl.set(sel, { opacity: 0 }, at);
+    // The V key's white becomes the palette: the full-frame fill closes onto its glass.
+    tl.fromTo("#s-flash", { clipPath: "inset(0px 0px 0px 0px round 0px)" }, { clipPath: "inset(180px 400px 180px 400px round 36px)", duration: 0.34, ease: "expo.out" }, 0);
+    tl.to("#s-flash", { opacity: 0, duration: 0.14, ease: "power2.out" }, 0.24);
+    // "stag key" on 16ths; the list folds when a word completes, as the real search does.
+    const at = [0.75, 0.875, 1.0, 1.125, 1.25, 1.375, 1.5, 1.625];
+    tl.set("#s-ph", { opacity: 0 }, at[0]);
+    at.forEach((t, i) => tl.set("#sq" + i, { display: "inline" }, t));
+    hide("#s-la", at[3]); show("#s-lb", at[3]);
+    hide("#s-lb", at[7]); show("#s-lc", at[7]);
+    // Return: the chip is pressed, the palette closes the way the app closes it, the key is pasted.
+    tl.to("#sc1-ret", { scale: 0.86, duration: 0.07, ease: "power2.out" }, 2.5);
+    tl.to("#sc1-ret", { scale: 1, duration: 0.12, ease: "power2.out" }, 2.57);
+    tl.to("#s-pal", { scale: 0.97, opacity: 0, duration: 0.14, ease: "power3.in" }, 2.6);
+    tl.fromTo("#s-msg", { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "power2.out" }, 2.55);
+    tl.fromTo("#s-paste", { opacity: 0, backgroundColor: "rgba(90,79,253,0.35)" }, { opacity: 1, duration: 0.01 }, 2.8);
+    tl.to("#s-paste", { backgroundColor: "rgba(90,79,253,0)", duration: 0.6, ease: "power2.out" }, 2.9);
+    window.__timelines["search"] = tl;
+  </script>
+</template>

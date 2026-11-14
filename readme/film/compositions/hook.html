@@ -1,0 +1,61 @@
+<template>
+  <link rel="stylesheet" href="assets/spare.css" />
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    .sl { font-family: "SF"; font-size: 34px; color: rgba(255,255,255,.26); height: 74px; white-space: nowrap; }
+    .scol { position: absolute; top: 0; width: 560px; overflow: hidden; }
+    #h-stream-in { position: absolute; inset: 0; }
+    #h-l1 { left: 160px; top: 440px; font-size: 140px; color: #0e0c1f; }
+    #h-l2 { left: 160px; top: 430px; font-size: 170px; color: #ffffff; }
+    #h-n { display: inline-block; min-width: 1.2em; color: #c9c4ff; }
+    #h-caps { position: absolute; inset: 0; }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080" data-duration="6">
+    <div id="h-white" class="field f-white clip" data-start="0" data-duration="2" data-track-index="0"></div>
+    <div id="h-ink" class="field f-ink clip" data-start="2" data-duration="2" data-track-index="0"></div>
+    <div id="h-violet" class="field f-violet clip" data-start="4" data-duration="2" data-track-index="0"></div>
+    <div id="h-l1" class="type clip" data-start="0" data-duration="2" data-track-index="1"><span class="w" id="h1w0">You</span> <span class="w" id="h1w1">copied</span> <span class="w" id="h1w2">it</span> <span class="w" id="h1w3">an</span> <span class="w" id="h1w4">hour</span> <span class="w" id="h1w5">ago</span></div>
+    <div id="h-stream" class="clip" data-start="2" data-duration="2" data-track-index="1" style="position:absolute;inset:0" data-layout-allow-overflow data-layout-ignore><div id="h-stream-in"><div class="scol" style="left:120px"><div class="sl">Meeting moved to 3:30, same room</div><div class="sl">github.com/apple/swift-format</div><div class="sl">Image</div><div class="sl">ana@studio.dev</div><div class="sl">git rebase -i HEAD~3</div><div class="sl">#5A4FFD</div><div class="sl">Flight LH 1491 · seat 14C</div><div class="sl">npm run build -- --watch</div><div class="sl">Thanks! Sending it over now</div><div class="sl">developer.apple.com/documentation/appkit</div><div class="sl">Image</div><div class="sl">SELECT * FROM orders WHERE id = 4182</div><div class="sl">Invoice 2026-114.pdf</div><div class="sl">brew install ffmpeg</div></div><div class="scol" style="left:720px"><div class="sl">Image</div><div class="sl">SELECT * FROM orders WHERE id = 4182</div><div class="sl">Invoice 2026-114.pdf</div><div class="sl">brew install ffmpeg</div><div class="sl">Staging deploy notes — Thursday</div><div class="sl">+1 415 555 0132</div><div class="sl">Let’s ship it Friday</div><div class="sl">Image</div><div class="sl">ssh deploy@10.0.4.12</div><div class="sl">font-feature-settings: "ss01"</div><div class="sl">Q4 roadmap draft v3</div><div class="sl">https://figma.com/file/…</div><div class="sl">border-radius: 18px</div><div class="sl">See you at 7</div></div><div class="scol" style="left:1320px"><div class="sl">Q4 roadmap draft v3</div><div class="sl">https://figma.com/file/…</div><div class="sl">border-radius: 18px</div><div class="sl">See you at 7</div><div class="sl">Image</div><div class="sl">kubectl get pods -A</div><div class="sl">TODO: retry on 429</div><div class="sl">Room 4B, second floor</div><div class="sl">lorem ipsum dolor sit amet</div><div class="sl">⌘⇧V</div><div class="sl">Meeting moved to 3:30, same room</div><div class="sl">github.com/apple/swift-format</div><div class="sl">Image</div><div class="sl">ana@studio.dev</div></div></div></div>
+    <div id="h-l2" class="type clip" data-start="2" data-duration="2" data-track-index="2"><span id="h-n">1</span> copies later</div>
+    <div id="h-caps" class="clip" data-start="4" data-duration="2" data-track-index="1" data-layout-allow-overflow>
+      <div class="cap" id="h-c1" style="left:390px;top:370px">⌘</div>
+      <div class="cap" id="h-c2" style="left:810px;top:370px">⇧</div>
+      <div class="cap" id="h-c3" style="left:1230px;top:370px">V</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const capDown = "0 4px 0 #c9c4ff, 0 14px 30px rgba(14, 12, 31, 0.22)";
+    const capUp = "0 18px 0 #c9c4ff, 0 34px 60px rgba(14, 12, 31, 0.28)";
+    // A key press: down in 4 frames, back in 6.
+    const press = (sel, at) => {
+      tl.to(sel, { y: 14, boxShadow: capDown, duration: 0.13, ease: "expo.out" }, at);
+      tl.to(sel, { y: 0, boxShadow: capUp, duration: 0.2, ease: "power2.out" }, at + 0.13);
+    };
+    // A word or line arriving: blur 6 -> 0 and opacity in 4 frames, no translate.
+    const blurIn = (sel, at, d = 0.13) =>
+      tl.fromTo(sel, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: d, ease: "power2.out" }, at);
+    const show = (sel, at) => tl.set(sel, { opacity: 1 }, at);
+    const hide = (sel, at) => tl.set(sel, { opacity: 0 }, at);
+    // 0-2: the need, word by word on 8ths. "You" is on frame 0 for the thumbnail.
+    // The whole line is there in light grey from frame 0; each word turns to ink on an 8th.
+    tl.set(["#h1w1", "#h1w2", "#h1w3", "#h1w4", "#h1w5"], { color: "#d9d7e6" }, 0);
+    ["#h1w1", "#h1w2", "#h1w3", "#h1w4", "#h1w5"].forEach((s, i) => tl.to(s, { color: "#0e0c1f", duration: 0.1, ease: "power2.out" }, 0.25 * (i + 1)));
+    // 2-4: forty copies stream past; the count rolls on 16ths.
+    tl.fromTo("#h-stream-in", { y: 120 }, { y: -560, duration: 2, ease: "none" }, 2);
+    blurIn("#h-l2", 2, 0.16);
+    const count = { n: 1 };
+    tl.to(count, {
+      n: 40, duration: 1.25, ease: "power1.in",
+      onUpdate: () => { document.querySelector("#h-n").textContent = String(Math.round(count.n)); },
+    }, 2);
+    // 4-6: ⌘ ⇧ V land on the beats, are pressed together, and V zooms through.
+    ["#h-c1", "#h-c2", "#h-c3"].forEach((s, i) => {
+      tl.fromTo(s, { opacity: 0, y: -90, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, 4 + 0.5 * i);
+    });
+    ["#h-c1", "#h-c2", "#h-c3"].forEach((s) => press(s, 5.5));
+    tl.to(["#h-c1", "#h-c2"], { opacity: 0, filter: "blur(12px)", duration: 0.2, ease: "power3.in" }, 5.66);
+    tl.to("#h-c3", { scale: 9, x: -420, y: 20, duration: 0.3, ease: "power3.in" }, 5.66);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>
