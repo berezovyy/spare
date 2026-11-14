@@ -50,24 +50,27 @@ final class ClipRowView: NSView {
         }
 
         let side = Theme.Size.rowIcon
-        iconSize = [icon.widthAnchor.constraint(equalToConstant: side),
-                    icon.heightAnchor.constraint(equalToConstant: side)]
-        NSLayoutConstraint.activate(iconSize + [
-            // The icon's centre stays put whatever its size, so thumbnails and app icons share
-            // a column with the search glyph above them.
-            icon.centerXAnchor.constraint(
-                equalTo: leadingAnchor, constant: RowMetrics.inset + Theme.Size.thumbnail / 2),
-            icon.centerYAnchor.constraint(equalTo: centerYAnchor),
-            title.leadingAnchor.constraint(
-                equalTo: leadingAnchor,
-                constant: RowMetrics.inset + Theme.Size.thumbnail + Theme.Spacing.lg),
-            title.centerYAnchor.constraint(equalTo: centerYAnchor),
-            title.trailingAnchor.constraint(
-                lessThanOrEqualTo: trailing.leadingAnchor, constant: -Theme.Spacing.lg),
-            trailing.trailingAnchor.constraint(
-                equalTo: trailingAnchor, constant: -RowMetrics.inset),
-            trailing.centerYAnchor.constraint(equalTo: centerYAnchor)
-        ])
+        iconSize = [
+            icon.widthAnchor.constraint(equalToConstant: side),
+            icon.heightAnchor.constraint(equalToConstant: side)
+        ]
+        NSLayoutConstraint.activate(
+            iconSize + [
+                // The icon's centre stays put whatever its size, so thumbnails and app icons share
+                // a column with the search glyph above them.
+                icon.centerXAnchor.constraint(
+                    equalTo: leadingAnchor, constant: RowMetrics.inset + Theme.Size.thumbnail / 2),
+                icon.centerYAnchor.constraint(equalTo: centerYAnchor),
+                title.leadingAnchor.constraint(
+                    equalTo: leadingAnchor,
+                    constant: RowMetrics.inset + Theme.Size.thumbnail + Theme.Spacing.lg),
+                title.centerYAnchor.constraint(equalTo: centerYAnchor),
+                title.trailingAnchor.constraint(
+                    lessThanOrEqualTo: trailing.leadingAnchor, constant: -Theme.Spacing.lg),
+                trailing.trailingAnchor.constraint(
+                    equalTo: trailingAnchor, constant: -RowMetrics.inset),
+                trailing.centerYAnchor.constraint(equalTo: centerYAnchor)
+            ])
         repaintInk()
     }
 
@@ -286,7 +289,8 @@ enum RowText {
     /// The first non-blank line; a link without its scheme, which is noise to a reader.
     static func headline(_ item: ClipboardItem) -> String {
         guard let text = item.text else { return "Image" }
-        let line = text.split(whereSeparator: \.isNewline)
+        let line =
+            text.split(whereSeparator: \.isNewline)
             .lazy.map { $0.trimmingCharacters(in: .whitespaces) }
             .first { !$0.isEmpty } ?? ""
         guard item.textForm == .link else { return line }

@@ -338,7 +338,8 @@ struct ClipboardTests {
         store.remove(doomed, keepingBlob: true)
         let reopened = ClipboardStore(directory: dir)
         reopened.load()
-        expect(!FileManager.default.fileExists(atPath: doomed.imagePath ?? ""), "the orphan is gone")
+        expect(
+            !FileManager.default.fileExists(atPath: doomed.imagePath ?? ""), "the orphan is gone")
         expect(FileManager.default.fileExists(atPath: kept), "a referenced file stays")
     }
 
@@ -362,7 +363,8 @@ struct ClipboardTests {
         expect(restored?.id == copy.id, "the undo lands on the copy already there")
         expect(store.items.count { $0.kind == .image } == 1, "one picture in the list")
         expect(waitForRemoval(of: oldPath), "and the deleted one's file is gone")
-        expect(FileManager.default.fileExists(atPath: copy.imagePath ?? ""), "the copy's file stays")
+        expect(
+            FileManager.default.fileExists(atPath: copy.imagePath ?? ""), "the copy's file stays")
     }
 
     // MARK: - Helpers

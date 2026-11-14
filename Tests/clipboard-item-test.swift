@@ -123,7 +123,8 @@ struct ClipboardItemTests {
         expect(image.matches("image") && image.matches("screenshot"), "an image answers to both")
         expect(image.matches("imag"), "four letters of a kind are enough to mean it")
         expect(!prose.matches("link") && !prose.matches("image"), "prose answers to neither")
-        expect(!image.matches("ima") && !image.matches("pic"), "three letters are content, not a kind")
+        expect(
+            !image.matches("ima") && !image.matches("pic"), "three letters are content, not a kind")
         expect(!mail.matches("add"), "'add' typed as content does not pull in every address")
         // Finder hands out decomposed names; people type composed ones, and the other way round.
         let nfd = ClipboardItem(kind: .text, text: "한글 파일".decomposedStringWithCanonicalMapping)
@@ -131,10 +132,12 @@ struct ClipboardItemTests {
         let kana = ClipboardItem(kind: .text, text: "か\u{3099}ぞく")
         expect(kana.matches(ClipboardItem.fold("がぞく")), "a separate dakuten still matches")
         let nfc = ClipboardItem(kind: .text, text: "한글")
-        expect(nfc.matches(ClipboardItem.fold("한글".decomposedStringWithCanonicalMapping)), "and back")
+        expect(
+            nfc.matches(ClipboardItem.fold("한글".decomposedStringWithCanonicalMapping)), "and back")
         let stored = ClipboardItem(
             kind: .text, text: "한글", searchKey: "한글".decomposedStringWithCanonicalMapping)
-        expect(stored.matches(ClipboardItem.fold("한")), "a key stored decomposed is composed on load")
+        expect(
+            stored.matches(ClipboardItem.fold("한")), "a key stored decomposed is composed on load")
         let pinned = ClipboardItem(kind: .text, text: "x", pinnedAt: Date())
         expect(pinned.matches("pinned"), "a pin answers to 'pinned'")
         expect(!pinned.matches("pin"), "but 'pin' is a content word")

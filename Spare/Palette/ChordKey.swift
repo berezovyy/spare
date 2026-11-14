@@ -7,7 +7,7 @@ enum ChordKey {
     /// US-layout virtual key codes for the keys the palette answers.
     private static let usLayout: [UInt16: String] = [
         0: "a", 3: "f", 6: "z", 7: "x", 8: "c", 9: "v", 35: "p",
-        18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9",
+        18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9"
     ]
 
     /// `withCommand` is `event.characters`: "Dvorak – QWERTY ⌘" switches to QWERTY only while ⌘

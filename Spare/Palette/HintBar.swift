@@ -114,7 +114,7 @@ final class HintBar: GlassCapsule {
             Self.hint("⌘P", pinLabel),
             Self.hint("⌘⌫", Self.label("Delete")),
             Self.hint("⌘C", Self.label("Copy")),
-            Self.hint("⌘F", Self.label("Filter")),
+            Self.hint("⌘F", Self.label("Filter"))
         ])
     }
 

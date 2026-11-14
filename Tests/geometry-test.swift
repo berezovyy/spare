@@ -159,7 +159,8 @@ struct GeometryTests {
     /// ⌘P is ⌘P on a Ukrainian or French keyboard too; a Dvorak user keeps their own letters.
     static func chordsSurviveAnyKeyboardLayout() {
         expect(ChordKey.resolve(typed: "p", keyCode: 35) == "p", "US: the letter typed")
-        expect(ChordKey.resolve(typed: "P", keyCode: 35) == "p", "Caps Lock's capital is the same key")
+        expect(
+            ChordKey.resolve(typed: "P", keyCode: 35) == "p", "Caps Lock's capital is the same key")
         expect(ChordKey.resolve(typed: "з", keyCode: 35) == "p", "Cyrillic: the key's US position")
         expect(ChordKey.resolve(typed: "с", keyCode: 8) == "c", "Cyrillic с is not Latin c")
         expect(ChordKey.resolve(typed: "&", keyCode: 18) == "1", "AZERTY's unshifted 1 key is ⌘1")
@@ -170,7 +171,9 @@ struct GeometryTests {
         expect(ChordKey.resolve(typed: ";", keyCode: 6) == ";", "Dvorak's ; is not ⌘Z")
         expect(ChordKey.resolve(typed: ".", keyCode: 9) == ".", "nor its . ⌘V")
         expect(ChordKey.resolve(typed: "3", keyCode: 20) == "3", "digits as typed")
-        expect(ChordKey.resolve(typed: "\u{7f}", keyCode: 51) == "\u{7f}", "unmapped keys pass through")
+        expect(
+            ChordKey.resolve(typed: "\u{7f}", keyCode: 51) == "\u{7f}", "unmapped keys pass through"
+        )
     }
 
     // MARK: - Helpers

@@ -135,7 +135,7 @@ final class WindowController: NSObject, NSWindowDelegate {
             list.scrollView.topAnchor.constraint(equalTo: surface.topAnchor),
             list.scrollView.leadingAnchor.constraint(equalTo: surface.leadingAnchor),
             list.scrollView.trailingAnchor.constraint(equalTo: surface.trailingAnchor),
-            list.scrollView.bottomAnchor.constraint(equalTo: surface.bottomAnchor),
+            list.scrollView.bottomAnchor.constraint(equalTo: surface.bottomAnchor)
         ])
         let stripView = NSView()
         strip.contentView = stripView
@@ -144,7 +144,7 @@ final class WindowController: NSObject, NSWindowDelegate {
             stripView.addSubview(capsule)
             NSLayoutConstraint.activate([
                 capsule.centerXAnchor.constraint(equalTo: stripView.centerXAnchor),
-                capsule.centerYAnchor.constraint(equalTo: stripView.centerYAnchor),
+                capsule.centerYAnchor.constraint(equalTo: stripView.centerYAnchor)
             ])
         }
         // Hidden views keep their constraints, so the field is tied to the tag only while the
@@ -366,8 +366,10 @@ final class WindowController: NSObject, NSWindowDelegate {
         let entries: [(String, String, (WindowController) -> Void)] = [
             ("Paste", "arrow.turn.down.left", { $0.onActivate?(item) }),
             ("Copy", "doc.on.doc", { $0.onCopy?(item) }),
-            (item.isPinned ? "Unpin" : "Pin", item.isPinned ? "pin.slash" : "pin",
-             { $0.store.togglePinned(item) }),
+            (
+                item.isPinned ? "Unpin" : "Pin", item.isPinned ? "pin.slash" : "pin",
+                { $0.store.togglePinned(item) }
+            ),
             ("Delete", "trash", { $0.delete(item) })
         ]
         for (title, symbol, action) in entries {

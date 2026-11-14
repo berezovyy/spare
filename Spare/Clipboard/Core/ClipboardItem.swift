@@ -38,7 +38,9 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
         self.text = text
         // Keys stored before folding composed may be decomposed; ASCII never needs the pass.
         self.searchKey =
-            searchKey.map { $0.utf8.allSatisfy { $0 < 0x80 } ? $0 : $0.precomposedStringWithCanonicalMapping }
+            searchKey.map {
+                $0.utf8.allSatisfy { $0 < 0x80 } ? $0 : $0.precomposedStringWithCanonicalMapping
+            }
             ?? Self.searchKey(for: text)
         appKey = sourceApp?.split(separator: ".").last.map { Self.fold(String($0)) } ?? ""
         self.imagePath = imagePath
@@ -100,7 +102,7 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
     }
 
     private static let kindWords = [
-        "pinned", "image", "picture", "photo", "screenshot", "link", "url", "website", "email",
+        "pinned", "image", "picture", "photo", "screenshot", "link", "url", "website", "email"
     ]
 
     /// A byte search. Both sides are folded the same way, so comparing UTF-8 finds what
