@@ -38,6 +38,23 @@ sed -e 's|$(EXECUTABLE_NAME)|Spare|' \
     -e 's|$(MACOSX_DEPLOYMENT_TARGET)|26.0|' \
     Spare/Info.plist > "$app/Contents/Info.plist"
 
+# The icon is an Icon Composer document: actool turns it into the Liquid Glass asset macOS 26
+# draws, plus an .icns for anything older that reads the bundle. actool ships with Xcode only,
+# and resolves relative paths against its input rather than the working directory; without it
+# the app still builds, with the generic icon.
+if xcrun --find actool >/dev/null 2>&1; then
+    if ! xcrun actool "$PWD/Spare/AppIcon.icon" --compile "$PWD/$app/Contents/Resources" \
+        --platform macosx --minimum-deployment-target 26.0 --target-device mac \
+        --app-icon AppIcon --output-partial-info-plist "$PWD/$out/icon.plist" \
+        --errors --warnings >/dev/null ||
+        [ ! -f "$app/Contents/Resources/Assets.car" ]; then
+        echo "FAIL  the app icon did not compile"
+        exit 1
+    fi
+else
+    echo "warn  actool not found (Xcode not installed): building without the app icon"
+fi
+
 # The stable identity keeps the Accessibility grant across rebuilds; an ad-hoc
 # signature changes every build and silently drops it. Signing with it needs a
 # keychain unlock that blocks forever without someone at the screen, so it is
