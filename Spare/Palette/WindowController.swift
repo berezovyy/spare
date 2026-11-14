@@ -162,10 +162,9 @@ final class WindowController: NSObject, NSWindowDelegate {
         guard flags == .command else { return false }
         // Mid-dismiss the panel is still key; a second chord would paste twice.
         guard !isHiding else { return true }
-        // Both spellings: on a non-Latin layout one of them is usually the Latin letter.
-        let keys = [event.charactersIgnoringModifiers, event.characters]
-            .compactMap { $0?.lowercased() }
-        let key = keys.first { Int($0) != nil || "pcfvaxz".contains($0) } ?? keys.first ?? ""
+        let key = ChordKey.resolve(
+            withCommand: event.characters, typed: event.charactersIgnoringModifiers,
+            keyCode: event.keyCode)
         cancelHints()
         if let number = Int(key), let item = list.item(number: number) {
             onActivate?(item)

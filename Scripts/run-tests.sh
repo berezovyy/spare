@@ -88,7 +88,8 @@ run geometry-test -framework AppKit -framework ImageIO -lsqlite3 \
                   Spare/Platform/ImageThumbnail.swift \
                   Spare/Platform/AppIdentity.swift \
                   Spare/Palette/RowViews.swift \
-                  Spare/Palette/ListController.swift
+                  Spare/Palette/ListController.swift \
+                  Spare/Palette/ChordKey.swift
 
 # Paster plus Core and the Accessibility check it guards ⌘V with — never the monitor: the write
 # seam has to compile without anything that touches `NSPasteboard.general`.
