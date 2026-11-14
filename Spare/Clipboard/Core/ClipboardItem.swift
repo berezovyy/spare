@@ -17,6 +17,9 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
     let createdAt: Date
     /// Bundle ID of the app frontmost when the copy was captured.
     let sourceApp: String?
+    /// The bundle id's last component, folded once: `com.apple.Safari` → `safari`. Matching the
+    /// whole id would let "apple" or "com" select half the history.
+    let appKey: String
     /// When the entry was pinned; pins lead the list and are exempt from pruning.
     let pinnedAt: Date?
 
@@ -33,7 +36,11 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
         self.id = id
         self.kind = kind
         self.text = text
-        self.searchKey = searchKey ?? Self.searchKey(for: text)
+        // Keys stored before folding composed may be decomposed; ASCII never needs the pass.
+        self.searchKey =
+            searchKey.map { $0.utf8.allSatisfy { $0 < 0x80 } ? $0 : $0.precomposedStringWithCanonicalMapping }
+            ?? Self.searchKey(for: text)
+        appKey = sourceApp?.split(separator: ".").last.map { Self.fold(String($0)) } ?? ""
         self.imagePath = imagePath
         self.imageUTI = imageUTI
         self.imageHash = imageHash
@@ -57,9 +64,12 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
     }
 
     /// `locale: nil` is load-bearing: a Turkish fold maps `I` to `ı` and orphans every stored key.
+    /// Composed (NFC) last: the search compares bytes, and Finder hands out names decomposed, so
+    /// a typed "한" or "が" has to meet the same bytes a copied file name was stored as.
     static func fold(_ s: String) -> String {
         s.trimmingCharacters(in: .whitespacesAndNewlines)
             .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
+            .precomposedStringWithCanonicalMapping
     }
 
     /// The caller folds the query once, so a scan never re-folds a row. Every word has to hit,
@@ -75,24 +85,46 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
     }
 
     private func matchesWord<S: StringProtocol>(_ word: S) -> Bool {
-        if searchKey.contains(word) { return true }
-        if let app = sourceAppName, app.contains(word) { return true }
-        // Whole type words always count; a prefix needs four letters, so "add", "pin" or "pic"
-        // typed as content do not drag in every address, pin or picture.
-        return typeWords.contains { $0 == word || (word.count >= 4 && $0.hasPrefix(word)) }
+        let word = String(word)
+        if Self.bytes(of: searchKey, contain: word) { return true }
+        if Self.bytes(of: appKey, contain: word) { return true }
+        // Classifying a row is the slow part, so only a word that could name a kind pays for it.
+        guard Self.kindWords.contains(where: { Self.names($0, word) }) else { return false }
+        return typeWords.contains { Self.names($0, word) }
     }
 
-    /// The bundle id's last component, folded: `com.apple.Safari` → `safari`. Matching the whole
-    /// id would let "apple" or "com" select half the history.
-    private var sourceAppName: String? {
-        sourceApp?.split(separator: ".").last.map { Self.fold(String($0)) }
+    /// Whole type words always count; a prefix needs four letters, so "add", "pin" or "pic"
+    /// typed as content do not drag in every address, pin or picture.
+    private static func names(_ kindWord: String, _ word: String) -> Bool {
+        kindWord == word || (word.count >= 4 && kindWord.hasPrefix(word))
+    }
+
+    private static let kindWords = [
+        "pinned", "image", "picture", "photo", "screenshot", "link", "url", "website", "email",
+    ]
+
+    /// A byte search. Both sides are folded the same way, so comparing UTF-8 finds what
+    /// `String.contains` finds, at a fraction of the cost: that one compares Characters, and a
+    /// 4 KB key per row per keystroke is what made typing lag.
+    private static func bytes(of haystack: String, contain needle: String) -> Bool {
+        var haystack = haystack
+        var needle = needle
+        return haystack.withUTF8 { h in
+            needle.withUTF8 { n in
+                guard !n.isEmpty else { return true }
+                guard n.count <= h.count, let hb = h.baseAddress, let nb = n.baseAddress else {
+                    return false
+                }
+                return memmem(hb, h.count, nb, n.count) != nil
+            }
+        }
     }
 
     /// What this entry *is*, in the words a person would type for it.
     private var typeWords: [String] {
         var words: [String] = isPinned ? ["pinned"] : []
         switch kind {
-        case .image: words += ["image", "picture", "photo", "screenshot"]
+        case .image: words += ["image", "picture", "photo", "screenshot"]  // all in `kindWords`
         case .text:
             switch textForm {
             case .link: words += ["link", "url", "website"]
