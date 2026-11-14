@@ -22,6 +22,8 @@ struct ClipboardTests {
         aDatabaseThatWillNotOpenIsKept()
         foldedSubstringSurvivesAReload()
         imagesAreFilesNotBlobs()
+        aDeleteCanBeUndone()
+        anOrphanedImageIsSweptOnLoad()
 
         print("\(passes)/\(passes + failures) passed")
         if failures > 0 { exit(1) }
@@ -286,6 +288,57 @@ struct ClipboardTests {
         store.remove(foreign)
         expect(
             FileManager.default.fileExists(atPath: outside.path), "a path we do not own survives")
+    }
+
+    /// ⌘⌫ then ⌘Z: the same row comes back where its age puts it, image file and all; only when
+    /// the undo window closes does the file go.
+    static func aDeleteCanBeUndone() {
+        let dir = scratch()
+        defer { remove(dir) }
+        let store = ClipboardStore(directory: dir)
+        store.addText("oldest", sourceApp: nil)
+        store.addImage(pngBytes(fill: 0x11), uti: "public.png", sourceApp: nil)
+        store.addText("newest", sourceApp: nil)
+        guard store.items.count == 3, let picture = store.items.first(where: { $0.kind == .image }),
+            let path = picture.imagePath
+        else { return expect(false, "three rows recorded") }
+
+        store.remove(picture, keepingBlob: true)
+        expect(!store.items.contains { $0.id == picture.id }, "the row is gone from the list")
+        expect(FileManager.default.fileExists(atPath: path), "but its file waits for an undo")
+
+        store.restore(picture)
+        expect(store.items.map(\.text) == ["newest", nil, "oldest"], "it returns to its own place")
+        store.restore(picture)
+        expect(store.items.count == 3, "restoring twice does not duplicate it")
+        let reopened = ClipboardStore(directory: dir)
+        reopened.load()
+        expect(
+            reopened.items.map(\.id) == store.items.map(\.id),
+            "and keeps its place after a relaunch, not jumping to the top")
+        store.discardBlob(of: picture)
+        expect(FileManager.default.fileExists(atPath: path), "a restored row keeps its file")
+
+        store.remove(picture, keepingBlob: true)
+        store.discardBlob(of: picture)
+        expect(waitForRemoval(of: path), "once the undo window closes, the file goes")
+    }
+
+    /// A delete still waiting on its undo when the app quit leaves a file no row points at.
+    static func anOrphanedImageIsSweptOnLoad() {
+        let dir = scratch()
+        defer { remove(dir) }
+        let store = ClipboardStore(directory: dir)
+        store.addImage(pngBytes(fill: 0x21), uti: "public.png", sourceApp: nil)
+        store.addImage(pngBytes(fill: 0x22), uti: "public.png", sourceApp: nil)
+        guard store.items.count == 2, let kept = store.items.first?.imagePath,
+            let doomed = store.items.last
+        else { return expect(false, "two images recorded") }
+        store.remove(doomed, keepingBlob: true)
+        let reopened = ClipboardStore(directory: dir)
+        reopened.load()
+        expect(!FileManager.default.fileExists(atPath: doomed.imagePath ?? ""), "the orphan is gone")
+        expect(FileManager.default.fileExists(atPath: kept), "a referenced file stays")
     }
 
     // MARK: - Helpers

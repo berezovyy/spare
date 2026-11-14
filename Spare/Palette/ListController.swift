@@ -117,8 +117,8 @@ final class ListController: NSObject, NSTableViewDataSource, NSTableViewDelegate
 
     // MARK: - Updating
 
-    /// No debounce: a scan of 1,000 entries is ~11 ms (measured) and `reloadData` only asks for
-    /// visible rows.
+    /// No debounce: a scan of 1,000 entries is under 3 ms even when every one is long
+    /// (measured), and `reloadData` only asks for visible rows.
     func queryChanged(_ query: String) {
         self.query = query
         reload()
@@ -153,6 +153,13 @@ final class ListController: NSObject, NSTableViewDataSource, NSTableViewDelegate
     func reset() {
         query = ""
         filter = .all
+    }
+
+    /// Puts the selection on an entry by id, if it is in the list.
+    func select(_ id: ClipboardItem.ID) {
+        guard let index = rows.firstIndex(where: { $0.id == id }) else { return }
+        selection = index
+        selectAndReveal(index, animated: true)
     }
 
     /// -1 for up, +1 for down. A move that would leave the list simply does not happen.

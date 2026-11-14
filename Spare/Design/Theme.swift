@@ -53,6 +53,8 @@ enum Theme {
         /// flashes them, and how fast they come and go.
         static let hintDelay: TimeInterval = 0.35
         static let hintFade: TimeInterval = 0.15
+        /// How long "Deleted · ⌘Z Undo" stays up; ⌘Z keeps working until the panel closes.
+        static let undoLinger: TimeInterval = 4
         /// The selection pill gliding between rows.
         static let selectionDuration: TimeInterval = 0.2
         /// Ease-out with a soft tail, the curve AppKit's own highlights settle on.

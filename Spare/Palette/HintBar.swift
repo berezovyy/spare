@@ -1,30 +1,22 @@
 import AppKit
 
-/// What ⌘ can do, shown only while ⌘ is held: a small glass capsule over the bottom of the list.
-/// Nobody has to learn it to use the palette; anybody who holds ⌘ finds it.
-final class HintBar: NSView {
+/// A small glass capsule of keycaps and words over the bottom of the list. Information, never a
+/// target: clicks fall through to the row under it.
+class GlassCapsule: NSView {
     private let glass = NSGlassEffectView()
-    private let pinLabel = NSTextField(labelWithString: "Pin")
 
-    init() {
+    init(_ items: [NSView]) {
         super.init(frame: .zero)
         glass.style = .regular
         glass.cornerRadius = Theme.Size.hintBarHeight / 2
         glass.translatesAutoresizingMaskIntoConstraints = false
         addSubview(glass)
 
-        let hints = NSStackView(views: [
-            Self.hint("⌘1–9", label(text: "Paste")),
-            Self.hint("⌘P", pinLabel),
-            Self.hint("⌘⌫", label(text: "Delete")),
-            Self.hint("⌘C", label(text: "Copy")),
-            Self.hint("⌘F", label(text: "Filter"))
-        ])
+        let hints = NSStackView(views: items)
         hints.orientation = .horizontal
         hints.spacing = Theme.Spacing.xl
         hints.translatesAutoresizingMaskIntoConstraints = false
         addSubview(hints)
-        style(pinLabel)
 
         NSLayoutConstraint.activate([
             glass.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -43,13 +35,7 @@ final class HintBar: NSView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { nil }
 
-    /// Hints are information, never targets: clicks fall through to the row under them.
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
-
-    /// "Pin" or "Unpin", for whatever is selected right now.
-    func update(selectionIsPinned: Bool) {
-        pinLabel.stringValue = selectionIsPinned ? "Unpin" : "Pin"
-    }
 
     /// Bumped by every call, so a fade-out that finishes after a newer fade-in leaves it alone.
     private var generation = 0
@@ -72,21 +58,48 @@ final class HintBar: NSView {
         }
     }
 
-    private func label(text: String) -> NSTextField {
+    static func label(_ text: String) -> NSTextField {
         let field = NSTextField(labelWithString: text)
-        style(field)
+        field.font = Theme.Typography.keyCap()
+        field.textColor = Theme.Colors.textSecondary
         return field
     }
 
-    private func style(_ field: NSTextField) {
-        field.font = Theme.Typography.keyCap()
-        field.textColor = Theme.Colors.textSecondary
-    }
-
-    private static func hint(_ cap: String, _ label: NSTextField) -> NSView {
+    /// A keycap followed by what it does.
+    static func hint(_ cap: String, _ label: NSTextField) -> NSView {
         let stack = NSStackView(views: [KeyCapChip(text: cap), label])
         stack.orientation = .horizontal
         stack.spacing = Theme.Spacing.sm
         return stack
+    }
+}
+
+/// What ⌘ can do, shown only while ⌘ is held. Nobody has to learn it to use the palette;
+/// anybody who holds ⌘ finds it.
+final class HintBar: GlassCapsule {
+    private let pinLabel = GlassCapsule.label("Pin")
+
+    init() {
+        super.init([
+            Self.hint("⌘1–9", Self.label("Paste")),
+            Self.hint("⌘P", pinLabel),
+            Self.hint("⌘⌫", Self.label("Delete")),
+            Self.hint("⌘C", Self.label("Copy")),
+            Self.hint("⌘F", Self.label("Filter")),
+        ])
+    }
+
+    /// "Pin" or "Unpin", for whatever is selected right now.
+    func update(selectionIsPinned: Bool) {
+        pinLabel.stringValue = selectionIsPinned ? "Unpin" : "Pin"
+    }
+}
+
+/// Shown for a few seconds after a delete: the one way back from ⌘⌫, said where the eye is.
+final class UndoToast: GlassCapsule {
+    init() {
+        let deleted = GlassCapsule.label("Deleted")
+        deleted.textColor = Theme.Colors.textPrimary
+        super.init([deleted, Self.hint("⌘Z", Self.label("Undo"))])
     }
 }

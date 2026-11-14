@@ -23,6 +23,12 @@ final class WindowController: NSObject, NSWindowDelegate {
     /// Says which filter is on, and clears it when clicked. Hidden while everything is shown.
     private let filterTag = NSButton(title: "", target: nil, action: nil)
     private let hintBar = HintBar()
+    private let undoToast = UndoToast()
+    /// Deleted while this summon is open, newest last: ⌘Z brings them back one at a time. Their
+    /// image files are kept until the panel closes, so an undo is whole.
+    private var undoable: [ClipboardItem] = []
+    private var toastDismiss: DispatchWorkItem?
+    private var toastShown = false
     private var fieldToEdge: NSLayoutConstraint?
     private var fieldToTag: NSLayoutConstraint?
     private let list: ListController
@@ -96,8 +102,9 @@ final class WindowController: NSObject, NSWindowDelegate {
         filterTag.action = #selector(clearFilterClicked)
         filterTag.isHidden = true
 
-        for view in [list.scrollView, list.emptyView, searchGlyph, searchField, filterTag, hintBar]
-        {
+        for view in [
+            list.scrollView, list.emptyView, searchGlyph, searchField, filterTag, hintBar, undoToast,
+        ] {
             view.translatesAutoresizingMaskIntoConstraints = false
             surface.addSubview(view)
         }
@@ -131,7 +138,9 @@ final class WindowController: NSObject, NSWindowDelegate {
             list.scrollView.bottomAnchor.constraint(equalTo: surface.bottomAnchor),
             hintBar.centerXAnchor.constraint(equalTo: surface.centerXAnchor),
             hintBar.bottomAnchor.constraint(
-                equalTo: surface.bottomAnchor, constant: -Theme.Spacing.lg)
+                equalTo: surface.bottomAnchor, constant: -Theme.Spacing.lg),
+            undoToast.centerXAnchor.constraint(equalTo: surface.centerXAnchor),
+            undoToast.bottomAnchor.constraint(equalTo: hintBar.bottomAnchor),
         ])
         // Hidden views keep their constraints, so the field is tied to the tag only while the
         // tag shows; otherwise it runs to the panel's edge.
@@ -156,7 +165,7 @@ final class WindowController: NSObject, NSWindowDelegate {
         // Both spellings: on a non-Latin layout one of them is usually the Latin letter.
         let keys = [event.charactersIgnoringModifiers, event.characters]
             .compactMap { $0?.lowercased() }
-        let key = keys.first { Int($0) != nil || "pcfvax".contains($0) } ?? keys.first ?? ""
+        let key = keys.first { Int($0) != nil || "pcfvaxz".contains($0) } ?? keys.first ?? ""
         cancelHints()
         if let number = Int(key), let item = list.item(number: number) {
             onActivate?(item)
@@ -169,7 +178,10 @@ final class WindowController: NSObject, NSWindowDelegate {
             // With a query typed, ⌘⌫ is the editor's "delete to start of line", never a delete
             // of history the user did not mean.
             guard searchField.stringValue.isEmpty else { return false }
-            if let item = list.selectedItem { store.remove(item) }
+            if let item = list.selectedItem { delete(item) }
+        case ("z", _):
+            guard !undoable.isEmpty else { return false }
+            undoDelete()
         case ("c", _):
             // A selection inside the query is the user copying their own words.
             if let editor = searchField.currentEditor(), editor.selectedRange.length > 0 {
@@ -240,9 +252,61 @@ final class WindowController: NSObject, NSWindowDelegate {
         // A reveal scheduled during the dismiss fade must not light up a hidden panel.
         if visible, !panel.isVisible || isHiding || !panel.isKeyWindow { return }
         guard list.showsShortcuts != visible else { return }
+        // One capsule at a time in the same spot; the hints say ⌘⌫ anyway.
+        if visible { setToastVisible(false) }
         hintBar.update(selectionIsPinned: list.selectedItem?.isPinned == true)
         hintBar.setVisible(visible)
         list.showsShortcuts = visible
+    }
+
+    // MARK: - Delete and undo
+
+    private func delete(_ item: ClipboardItem) {
+        guard store.remove(item, keepingBlob: true) else { return }
+        undoable.append(item)
+        setToastVisible(true)
+    }
+
+    private func undoDelete() {
+        guard let item = undoable.popLast() else { return }
+        guard store.restore(item) else {
+            // Still deleted: keep it owed to `settleDeletes`, so its file does not leak.
+            undoable.append(item)
+            return
+        }
+        // A query or filter typed since might hide it; an undo nobody can see reads as broken.
+        if !list.rows.contains(where: { $0.id == item.id }) {
+            searchField.stringValue = ""
+            list.queryChanged("")
+            _ = clearFilter()
+        }
+        // The store re-rendered keeping the old selection; the restored row is what was meant.
+        list.select(item.id)
+        setToastVisible(!undoable.isEmpty)
+    }
+
+    private func setToastVisible(_ visible: Bool) {
+        toastDismiss?.cancel()
+        toastDismiss = nil
+        if visible {
+            let dismiss = DispatchWorkItem { [weak self] in
+                MainActor.assumeIsolated { self?.setToastVisible(false) }
+            }
+            toastDismiss = dismiss
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + Theme.Motion.undoLinger, execute: dismiss)
+        }
+        // Tracked here, not read off the view: mid fade-out the toast is still unhidden.
+        guard toastShown != visible else { return }
+        toastShown = visible
+        undoToast.setVisible(visible)
+    }
+
+    /// The undo window closes with the panel: whatever is still deleted goes for good.
+    private func settleDeletes() {
+        for item in undoable { store.discardBlob(of: item) }
+        undoable.removeAll()
+        setToastVisible(false)
     }
 
     // MARK: - Menus
@@ -300,7 +364,7 @@ final class WindowController: NSObject, NSWindowDelegate {
             ("Copy", "doc.on.doc", { $0.onCopy?(item) }),
             (item.isPinned ? "Unpin" : "Pin", item.isPinned ? "pin.slash" : "pin",
              { $0.store.togglePinned(item) }),
-            ("Delete", "trash", { $0.store.remove(item) })
+            ("Delete", "trash", { $0.delete(item) })
         ]
         for (title, symbol, action) in entries {
             let entry = ClosureMenuItem(title: title) { [weak self] in
@@ -359,6 +423,7 @@ final class WindowController: NSObject, NSWindowDelegate {
         guard panel.isVisible, !isHiding else { return }
         isHiding = true
         cancelHints()
+        settleDeletes()
         animateScale(appearing: false)
         fade(to: 0, duration: Theme.Motion.dismissDuration, timing: Theme.Motion.easeIn) {
             [weak self] in

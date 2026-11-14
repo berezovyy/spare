@@ -37,6 +37,8 @@ final class ClipboardStore {
     private var searchCache: (query: String, filter: ClipboardFilter, result: [ClipboardItem])?
     /// The same memo for the empty query, so the pinned split runs once per mutation.
     private var orderedCache: [ClipboardItem]?
+    /// Where each delete awaiting its undo sat on disk.
+    private var removedRowIDs: [ClipboardItem.ID: sqlite3_int64] = [:]
 
     private let dbURL: URL
     private let imagesDir: URL
@@ -77,6 +79,23 @@ final class ClipboardStore {
         items = loaded
         // Age passes while the app isn't running; insert-time pruning alone can't catch that.
         enforceLimits()
+        sweepOrphanedImages()
+    }
+
+    /// An image whose row is gone: a delete still waiting on its undo when the app quit or
+    /// crashed. Nothing else would ever count or remove it.
+    private func sweepOrphanedImages() {
+        guard let stmt = statements[Self.imageRowsSQL] else { return }
+        var referenced: Set<String> = []
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            if let path = Self.columnString(stmt, 1) { referenced.insert(path) }
+        }
+        sqlite3_reset(stmt)
+        let manager = FileManager.default
+        for name in (try? manager.contentsOfDirectory(atPath: imagesDir.path)) ?? [] {
+            let path = imagesDir.appendingPathComponent(name).path
+            if !referenced.contains(path) { try? manager.removeItem(atPath: path) }
+        }
     }
 
     /// Called on load and whenever the retention or image-budget setting changes.
@@ -141,9 +160,39 @@ final class ClipboardStore {
         if item.isPinned { unpin(item) } else { pin(item) }
     }
 
-    func remove(_ item: ClipboardItem) {
-        guard perform(Self.deleteByIDSQL, { bindText($0, 1, item.id.uuidString) }) else { return }
+    /// `keepingBlob` leaves an image's file on disk so the delete can still be undone; the caller
+    /// then owes a `discardBlob(of:)` once the undo window closes.
+    @discardableResult
+    func remove(_ item: ClipboardItem, keepingBlob: Bool = false) -> Bool {
+        // The rowid is the row's place in history on the next launch; an undo puts it back.
+        if keepingBlob { removedRowIDs[item.id] = rowID(of: item) }
+        guard perform(Self.deleteByIDSQL, { bindText($0, 1, item.id.uuidString) }) else {
+            return false
+        }
         items.removeAll { $0.id == item.id }
+        if !keepingBlob { deleteBlob(item) }
+        return true
+    }
+
+    /// Undo of a `remove(_:keepingBlob: true)`: the same row, back where its age puts it — now
+    /// and after a relaunch, which orders by rowid. If a capture has taken the rowid since, the
+    /// row comes back as newest on disk rather than not at all.
+    @discardableResult
+    func restore(_ item: ClipboardItem) -> Bool {
+        guard isAvailable, !items.contains(where: { $0.id == item.id }) else { return false }
+        let rowID = removedRowIDs.removeValue(forKey: item.id)
+        guard (rowID.map { write(item, rowID: $0) } ?? false) || write(item) else { return false }
+        var next = items
+        let index = next.firstIndex { $0.createdAt < item.createdAt } ?? next.count
+        next.insert(item, at: index)
+        items = next
+        return true
+    }
+
+    /// The end of an undo window: the deleted image's bytes go for good.
+    func discardBlob(of item: ClipboardItem) {
+        removedRowIDs[item.id] = nil
+        guard !items.contains(where: { $0.id == item.id }) else { return }
         deleteBlob(item)
     }
 
@@ -243,8 +292,19 @@ final class ClipboardStore {
         trimWindow()
     }
 
-    private func write(_ item: ClipboardItem) -> Bool {
-        perform(Self.insertSQL) { stmt in
+    private func rowID(of item: ClipboardItem) -> sqlite3_int64? {
+        guard let stmt = statements[Self.rowIDSQL] else { return nil }
+        defer {
+            sqlite3_reset(stmt)
+            sqlite3_clear_bindings(stmt)
+        }
+        bindText(stmt, 1, item.id.uuidString)
+        return sqlite3_step(stmt) == SQLITE_ROW ? sqlite3_column_int64(stmt, 0) : nil
+    }
+
+    private func write(_ item: ClipboardItem, rowID: sqlite3_int64? = nil) -> Bool {
+        perform(rowID == nil ? Self.insertSQL : Self.insertAtSQL) { stmt in
+            if let rowID { sqlite3_bind_int64(stmt, 11, rowID) }
             self.bindText(stmt, 1, item.id.uuidString)
             self.bindText(stmt, 2, item.kind.rawValue)
             self.bindText(stmt, 3, item.text)
@@ -396,6 +456,9 @@ final class ClipboardStore {
         + "source_app, pinned_at"
 
     private static let insertSQL = "INSERT INTO items(\(columns)) VALUES(?,?,?,?,?,?,?,?,?,?)"
+    private static let insertAtSQL =
+        "INSERT INTO items(\(columns), rowid) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
+    private static let rowIDSQL = "SELECT rowid FROM items WHERE id = ?"
 
     /// Two indexed branches, deliberately not one `OR`: a pin can live far outside the window.
     private static let loadSQL = """
@@ -433,7 +496,7 @@ final class ClipboardStore {
 
     private static let allStatements = [
         insertSQL, loadSQL, windowFloorSQL, deleteByIDSQL, pinSQL, staleImagesSQL, deleteStaleSQL,
-        byHashSQL, imageRowsSQL
+        byHashSQL, imageRowsSQL, insertAtSQL, rowIDSQL
     ]
 
     private func openDatabase() -> Bool {
