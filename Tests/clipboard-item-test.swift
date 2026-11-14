@@ -14,6 +14,9 @@ struct ClipboardItemTests {
         foldingIsLocaleIndependent()
         searchKeyIsCappedAtInsert()
         matchingUsesTheFoldedQuery()
+        wordsMatchInAnyOrder()
+        aWordCanNameTheSourceApp()
+        aWordCanNameTheKindOfEntry()
         filterExclusivity()
         filterAllIsIdentity()
 
@@ -93,6 +96,38 @@ struct ClipboardItemTests {
         expect(item.matches("hello world"), "the caller folds once, the row does not re-fold")
         expect(!item.matches("Hello"), "an unfolded query is the caller's bug, not a match")
         expect(!item.matches("goodbye"), "a miss is a miss")
+    }
+
+    /// Typing "main git" finds "git rebase --onto main": each word has to hit, in any order.
+    static func wordsMatchInAnyOrder() {
+        let item = ClipboardItem(kind: .text, text: "git rebase --onto main")
+        expect(item.matches("main git"), "words match out of order")
+        expect(item.matches("git  main"), "repeated spaces are not a word")
+        expect(!item.matches("main svn"), "every word has to hit, not any")
+    }
+
+    static func aWordCanNameTheSourceApp() {
+        let item = ClipboardItem(kind: .text, text: "hello", sourceApp: "com.apple.Safari")
+        expect(item.matches("safari"), "the app's name finds what was copied from it")
+        expect(item.matches("safari hello"), "and combines with content words")
+        expect(!item.matches("apple"), "the vendor part of the bundle id is not the app")
+    }
+
+    static func aWordCanNameTheKindOfEntry() {
+        let link = ClipboardItem(kind: .text, text: "https://example.com/a")
+        let mail = ClipboardItem(kind: .text, text: "someone@example.com")
+        let image = ClipboardItem(kind: .image)
+        let prose = ClipboardItem(kind: .text, text: "just words")
+        expect(link.matches("link") && link.matches("url"), "a link answers to 'link' and 'url'")
+        expect(mail.matches("email"), "an address answers to 'email'")
+        expect(image.matches("image") && image.matches("screenshot"), "an image answers to both")
+        expect(image.matches("imag"), "four letters of a kind are enough to mean it")
+        expect(!prose.matches("link") && !prose.matches("image"), "prose answers to neither")
+        expect(!image.matches("ima") && !image.matches("pic"), "three letters are content, not a kind")
+        expect(!mail.matches("add"), "'add' typed as content does not pull in every address")
+        let pinned = ClipboardItem(kind: .text, text: "x", pinnedAt: Date())
+        expect(pinned.matches("pinned"), "a pin answers to 'pinned'")
+        expect(!pinned.matches("pin"), "but 'pin' is a content word")
     }
 
     /// The five are exclusive: a copied URL is a link rather than a narrower kind of text.

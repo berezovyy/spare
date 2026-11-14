@@ -62,9 +62,45 @@ struct ClipboardItem: Identifiable, Hashable, Sendable {
             .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
     }
 
-    /// The caller folds the query once, so a scan never re-folds a row.
+    /// The caller folds the query once, so a scan never re-folds a row. Every word has to hit,
+    /// in any order, and a word may hit the content, the source app ("safari") or what the
+    /// entry is ("link", "image") — so nobody has to learn a syntax to narrow the list.
     func matches(_ foldedQuery: String) -> Bool {
-        foldedQuery.isEmpty || searchKey.contains(foldedQuery)
+        guard !foldedQuery.isEmpty else { return true }
+        // The common case — one word — never pays for the split.
+        guard foldedQuery.contains(where: \.isWhitespace) else { return matchesWord(foldedQuery) }
+        return foldedQuery.split(whereSeparator: \.isWhitespace).allSatisfy {
+            matchesWord(Substring($0))
+        }
+    }
+
+    private func matchesWord<S: StringProtocol>(_ word: S) -> Bool {
+        if searchKey.contains(word) { return true }
+        if let app = sourceAppName, app.contains(word) { return true }
+        // Whole type words always count; a prefix needs four letters, so "add", "pin" or "pic"
+        // typed as content do not drag in every address, pin or picture.
+        return typeWords.contains { $0 == word || (word.count >= 4 && $0.hasPrefix(word)) }
+    }
+
+    /// The bundle id's last component, folded: `com.apple.Safari` → `safari`. Matching the whole
+    /// id would let "apple" or "com" select half the history.
+    private var sourceAppName: String? {
+        sourceApp?.split(separator: ".").last.map { Self.fold(String($0)) }
+    }
+
+    /// What this entry *is*, in the words a person would type for it.
+    private var typeWords: [String] {
+        var words: [String] = isPinned ? ["pinned"] : []
+        switch kind {
+        case .image: words += ["image", "picture", "photo", "screenshot"]
+        case .text:
+            switch textForm {
+            case .link: words += ["link", "url", "website"]
+            case .email: words += ["email"]
+            default: break
+            }
+        }
+        return words
     }
 }
 
