@@ -1,53 +1,81 @@
 #!/bin/bash
-# Package the Release app as dist/Spare-<version>.dmg. Usage: ./Scripts/build-dmg.sh [version]
+# Package the Release app as dist/Spare-<version>.dmg, with its SHA-256 next to it.
 #
-# Two build paths, and the script says which one it took:
-#   xcodebuild  — the real thing, when full Xcode is installed.
-#   build-app.sh — Command-Line-Tools-only machines. Same sources, same bundle id
-#                  (app.spare); it just cannot honour a MARKETING_VERSION override.
-# Either way the Debug channel (app.spare.dev) is untouched: Release is its own bundle id.
+#   Scripts/build-dmg.sh
+#
+# What the DMG is good for depends on what the environment provides:
+#   SPARE_SIGN_IDENTITY   "Developer ID Application: Name (TEAMID)". Signs the app and the DMG.
+#   SPARE_NOTARY_PROFILE  a notarytool keychain profile, saved once with
+#                         `xcrun notarytool store-credentials <profile> --apple-id … --team-id …`.
+#                         Notarizes and staples both, so Gatekeeper opens them offline.
+# With both, the DMG can be published. With neither, it opens only on this Mac: anywhere else
+# Gatekeeper refuses an ad-hoc signature.
+#
+# SPARE_VERSION / SPARE_BUILD override project.yml's version, as in build-app.sh.
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
-cd "$(dirname "$0")/.." || exit 1
-IDENTITY="Spare Self-Signed"
-DERIVED="build/DerivedData"
-
-if ! security find-identity -p codesigning | grep -q "$IDENTITY"; then
-    echo "x '$IDENTITY' code-signing identity not found — create it once before releasing." >&2
+identity="${SPARE_SIGN_IDENTITY:-}"
+profile="${SPARE_NOTARY_PROFILE:-}"
+if [ -n "$profile" ] && [ -z "$identity" ]; then
+    echo "x SPARE_NOTARY_PROFILE needs SPARE_SIGN_IDENTITY: Apple notarizes Developer ID signatures only" >&2
     exit 1
 fi
 
-if xcodebuild -version >/dev/null 2>&1; then
-    echo "> Building Spare.app (Release) with xcodebuild"
-    xcodegen generate
-    # --timestamp=none: a self-signed identity has no trusted timestamp authority.
-    xcodebuild -project Spare.xcodeproj -scheme Spare -configuration Release \
-        -derivedDataPath "$DERIVED" \
-        CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="$IDENTITY" \
-        OTHER_CODE_SIGN_FLAGS="--timestamp=none" \
-        ${1:+MARKETING_VERSION="$1"} \
-        build
-    APP="$DERIVED/Build/Products/Release/Spare.app"
-else
-    echo "> xcodebuild unavailable (Command Line Tools only) — building with Scripts/build-app.sh"
-    if [ $# -gt 0 ]; then echo "  note: version override '$1' ignored on this path" >&2; fi
-    # SPARE_SIGN is forwarded, not forced: signing with the identity needs a keychain
-    # unlock that blocks forever with nobody at the screen. Unset, build-app.sh signs ad-hoc.
-    ./Scripts/build-app.sh Release
-    APP="build/Release/Spare.app"
+./Scripts/build-app.sh Release
+app="build/Release/Spare.app"
+version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")"
+work="build/Release/package"
+rm -rf "$work"
+mkdir -p "$work" dist
+
+# Submits a file and waits. `--wait` exits 0 for a rejected submission too, so the status is read.
+notarize() {
+    local result status id
+    echo "> Notarizing $(basename "$1")"
+    result="$(xcrun notarytool submit "$1" --keychain-profile "$profile" --wait --output-format json)"
+    status="$(plutil -extract status raw - <<<"$result" 2>/dev/null || echo unknown)"
+    if [ "$status" != "Accepted" ]; then
+        id="$(plutil -extract id raw - <<<"$result" 2>/dev/null || true)"
+        echo "x notarization: $status" >&2
+        if [ -n "$id" ]; then xcrun notarytool log "$id" --keychain-profile "$profile" >&2 || true; fi
+        exit 1
+    fi
+}
+
+if [ -n "$profile" ]; then
+    # The app gets its own ticket so it still opens offline once it is out of the DMG.
+    ditto -c -k --keepParent "$app" "$work/Spare.zip"
+    notarize "$work/Spare.zip"
+    xcrun stapler staple -q "$app"
 fi
 
-VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")"
-DMG="dist/Spare-${VERSION}.dmg"
+dmg="dist/Spare-$version.dmg"
+echo "> Packaging $dmg"
+stage="$work/stage"
+mkdir -p "$stage"
+ditto "$app" "$stage/Spare.app"
+ln -s /Applications "$stage/Applications"
+rm -f "$dmg"
+hdiutil create -srcfolder "$stage" -format ULFO -volname "Spare $version" -fs APFS -quiet "$dmg"
 
-echo "> Packaging ${DMG}"
-mkdir -p dist
-STAGE="$(mktemp -d)"
-cp -R "$APP" "$STAGE/"
-ln -s /Applications "$STAGE/Applications"
-rm -f "$DMG"
-hdiutil create -srcfolder "$STAGE" -format UDZO -volname "Spare" -quiet "$DMG"
-rm -rf "$STAGE"
+if [ -n "$identity" ]; then
+    codesign --force --timestamp --sign "$identity" "$dmg"
+fi
+if [ -n "$profile" ]; then
+    notarize "$dmg"
+    xcrun stapler staple -q "$dmg"
+    spctl --assess --type open --context context:primary-signature "$dmg"
+    spctl --assess --type execute "$app"
+    status="notarized"
+elif [ -n "$identity" ]; then
+    status="signed, NOT notarized: Gatekeeper will still warn"
+else
+    status="unsigned: opens on this Mac only"
+fi
 
-echo "  binary $(stat -f%z "$APP/Contents/MacOS/Spare") bytes, dmg $(stat -f%z "$DMG") bytes"
-echo "v $DMG"
+(cd dist && shasum -a 256 "$(basename "$dmg")" > "$(basename "$dmg").sha256")
+rm -rf "$work"
+echo "  app $(du -sk "$app" | cut -f1) KB, dmg $(($(stat -f%z "$dmg") / 1024)) KB"
+echo "  sha256 $(cut -d' ' -f1 "$dmg.sha256")"
+echo "v $dmg ($status)"
