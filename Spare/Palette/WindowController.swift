@@ -268,19 +268,19 @@ final class WindowController: NSObject, NSWindowDelegate {
 
     private func undoDelete() {
         guard let item = undoable.popLast() else { return }
-        guard store.restore(item) else {
+        guard let restored = store.restore(item) else {
             // Still deleted: keep it owed to `settleDeletes`, so its file does not leak.
             undoable.append(item)
             return
         }
         // A query or filter typed since might hide it; an undo nobody can see reads as broken.
-        if !list.rows.contains(where: { $0.id == item.id }) {
+        if !list.rows.contains(where: { $0.id == restored.id }) {
             searchField.stringValue = ""
             list.queryChanged("")
             _ = clearFilter()
         }
         // The store re-rendered keeping the old selection; the restored row is what was meant.
-        list.select(item.id)
+        list.select(restored.id)
         setToastVisible(!undoable.isEmpty)
     }
 

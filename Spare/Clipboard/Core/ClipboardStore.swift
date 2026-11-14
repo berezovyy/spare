@@ -177,16 +177,24 @@ final class ClipboardStore {
     /// Undo of a `remove(_:keepingBlob: true)`: the same row, back where its age puts it — now
     /// and after a relaunch, which orders by rowid. If a capture has taken the rowid since, the
     /// row comes back as newest on disk rather than not at all.
+    ///
+    /// Returns the row that now stands for it: itself, or — when the same picture was copied
+    /// again in the meantime — that newer copy, so an undo never leaves the image twice.
     @discardableResult
-    func restore(_ item: ClipboardItem) -> Bool {
-        guard isAvailable, !items.contains(where: { $0.id == item.id }) else { return false }
+    func restore(_ item: ClipboardItem) -> ClipboardItem? {
+        guard isAvailable, !items.contains(where: { $0.id == item.id }) else { return nil }
+        if let hash = item.imageHash, let copy = itemByHash(hash), copy.id != item.id {
+            removedRowIDs[item.id] = nil
+            if copy.imagePath != item.imagePath { deleteBlob(item) }
+            return copy
+        }
         let rowID = removedRowIDs.removeValue(forKey: item.id)
-        guard (rowID.map { write(item, rowID: $0) } ?? false) || write(item) else { return false }
+        guard (rowID.map { write(item, rowID: $0) } ?? false) || write(item) else { return nil }
         var next = items
         let index = next.firstIndex { $0.createdAt < item.createdAt } ?? next.count
         next.insert(item, at: index)
         items = next
-        return true
+        return item
     }
 
     /// The end of an undo window: the deleted image's bytes go for good.

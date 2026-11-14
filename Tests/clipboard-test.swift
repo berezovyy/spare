@@ -24,6 +24,7 @@ struct ClipboardTests {
         imagesAreFilesNotBlobs()
         aDeleteCanBeUndone()
         anOrphanedImageIsSweptOnLoad()
+        undoAfterTheSamePictureReturnsKeepsOneCopy()
 
         print("\(passes)/\(passes + failures) passed")
         if failures > 0 { exit(1) }
@@ -307,7 +308,7 @@ struct ClipboardTests {
         expect(!store.items.contains { $0.id == picture.id }, "the row is gone from the list")
         expect(FileManager.default.fileExists(atPath: path), "but its file waits for an undo")
 
-        store.restore(picture)
+        expect(store.restore(picture)?.id == picture.id, "the undo brings back the same row")
         expect(store.items.map(\.text) == ["newest", nil, "oldest"], "it returns to its own place")
         store.restore(picture)
         expect(store.items.count == 3, "restoring twice does not duplicate it")
@@ -339,6 +340,29 @@ struct ClipboardTests {
         reopened.load()
         expect(!FileManager.default.fileExists(atPath: doomed.imagePath ?? ""), "the orphan is gone")
         expect(FileManager.default.fileExists(atPath: kept), "a referenced file stays")
+    }
+
+    /// Delete a picture, copy it again, then undo: one row and one file, not two of each.
+    static func undoAfterTheSamePictureReturnsKeepsOneCopy() {
+        let dir = scratch()
+        defer { remove(dir) }
+        let store = ClipboardStore(directory: dir)
+        let bytes = pngBytes(fill: 0x33)
+        store.addImage(bytes, uti: "public.png", sourceApp: nil)
+        store.addText("after", sourceApp: nil)
+        guard let original = store.items.first(where: { $0.kind == .image }),
+            let oldPath = original.imagePath
+        else { return expect(false, "the picture was recorded") }
+        store.remove(original, keepingBlob: true)
+        store.addImage(bytes, uti: "public.png", sourceApp: nil)
+        guard let copy = store.items.first, copy.kind == .image else {
+            return expect(false, "the re-copy was recorded")
+        }
+        let restored = store.restore(original)
+        expect(restored?.id == copy.id, "the undo lands on the copy already there")
+        expect(store.items.count { $0.kind == .image } == 1, "one picture in the list")
+        expect(waitForRemoval(of: oldPath), "and the deleted one's file is gone")
+        expect(FileManager.default.fileExists(atPath: copy.imagePath ?? ""), "the copy's file stays")
     }
 
     // MARK: - Helpers
