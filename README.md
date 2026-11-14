@@ -10,9 +10,12 @@ code. Everything stays on your Mac.
 
 Requires macOS 26 (Tahoe) or later, Apple silicon or Intel.
 
-1. Download `Spare-<version>.dmg` from the releases page and open it.
+1. Download `Spare-<version>.dmg` and open it.
 2. Drag **Spare** into **Applications**, then open it from there.
-3. The first time you paste from Spare, macOS asks for **Accessibility** access. Spare needs it
+3. Spare isn't notarized by Apple, so macOS refuses it the first time. Open **System Settings ›
+   Privacy & Security**, scroll down to the message about Spare and click **Open Anyway**. This
+   is needed once per version.
+4. The first time you paste from Spare, macOS asks for **Accessibility** access. Spare needs it
    to press ⌘V for you; without it, a chosen clip is copied and you paste it yourself.
 
 Spare lives in the menu bar. To start it with your Mac, turn on **Launch at login** in Settings.
@@ -57,7 +60,7 @@ with a generic icon).
 ```sh
 Scripts/build-app.sh            # build/Debug/Spare Dev.app — its own bundle id, prefs and history
 Scripts/build-app.sh Release    # build/Release/Spare.app, universal
-Scripts/run-tests.sh            # every harness; SPARE_SKIP_E2E=1 skips the one that pastes
+Scripts/run-tests.sh            # every harness; the last one copies and pastes for real
 ```
 
 `xcodegen generate` makes an Xcode project from `project.yml` if you prefer working in Xcode.
@@ -65,15 +68,12 @@ Scripts/run-tests.sh            # every harness; SPARE_SKIP_E2E=1 skips the one 
 ## Release
 
 ```sh
-SPARE_SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" \
-SPARE_NOTARY_PROFILE=spare-notary \
 Scripts/build-dmg.sh
 ```
 
-Builds, signs with the hardened runtime, notarizes and staples the app and the DMG, and writes
-`dist/Spare-<version>.dmg` with its SHA-256. The notary profile is saved once with
-`xcrun notarytool store-credentials spare-notary`. The version lives in `project.yml`.
-Without the two variables the DMG is unsigned and opens only on the Mac that built it.
+Writes `dist/Spare-<version>.dmg` and its SHA-256. The version lives in `project.yml`. With an
+Apple Developer ID, set `SPARE_SIGN_IDENTITY` and `SPARE_NOTARY_PROFILE` and the same script
+signs and notarizes it, so the Open Anyway step goes away (see the script's header).
 
 ## License
 

@@ -109,15 +109,10 @@ run key-shortcut-test Spare/HotKeys/KeyShortcut.swift
 # joined with `&&` a failed build would be a non-final AND-OR member and `set -e` would sail past
 # it. The harness itself skips cleanly when the app is not there. Only ClipboardItem is compiled
 # in, for `fold`: the search key it asserts on has to be the shipped one.
-# SPARE_SKIP_E2E=1 leaves it out, for machines with no one at the screen to grant Accessibility (CI).
-if [ "${SPARE_SKIP_E2E:-0}" = "1" ]; then
-    echo "skip  e2e-test (SPARE_SKIP_E2E)"
-else
-    if [ "$emit_db" -eq 0 ] && { [ -z "$only" ] || [ "$only" = "e2e-test" ]; }; then
-        ./Scripts/build-app.sh Debug
-    fi
-    run e2e-test -framework AppKit -lsqlite3 Spare/Clipboard/Core/ClipboardItem.swift
+if [ "$emit_db" -eq 0 ] && { [ -z "$only" ] || [ "$only" = "e2e-test" ]; }; then
+    ./Scripts/build-app.sh Debug
 fi
+run e2e-test -framework AppKit -lsqlite3 Spare/Clipboard/Core/ClipboardItem.swift
 
 if [ "$emit_db" -eq 1 ]; then
     printf ']\n' >> "$DB"
