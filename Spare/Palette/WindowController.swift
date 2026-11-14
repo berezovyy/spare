@@ -23,6 +23,8 @@ final class WindowController: NSObject, NSWindowDelegate {
     /// Says which filter is on, and clears it when clicked. Hidden while everything is shown.
     private let filterTag = NSButton(title: "", target: nil, action: nil)
     private let hintBar = HintBar()
+    /// Holds `hintBar` and `undoToast` just under the palette, never over a row.
+    private let strip = CapsuleStrip()
     private let undoToast = UndoToast()
     /// Deleted while this summon is open, newest last: ⌘Z brings them back one at a time. Their
     /// image files are kept until the panel closes, so an undo is whole.
@@ -102,9 +104,7 @@ final class WindowController: NSObject, NSWindowDelegate {
         filterTag.action = #selector(clearFilterClicked)
         filterTag.isHidden = true
 
-        for view in [
-            list.scrollView, list.emptyView, searchGlyph, searchField, filterTag, hintBar, undoToast,
-        ] {
+        for view in [list.scrollView, list.emptyView, searchGlyph, searchField, filterTag] {
             view.translatesAutoresizingMaskIntoConstraints = false
             surface.addSubview(view)
         }
@@ -136,12 +136,17 @@ final class WindowController: NSObject, NSWindowDelegate {
             list.scrollView.leadingAnchor.constraint(equalTo: surface.leadingAnchor),
             list.scrollView.trailingAnchor.constraint(equalTo: surface.trailingAnchor),
             list.scrollView.bottomAnchor.constraint(equalTo: surface.bottomAnchor),
-            hintBar.centerXAnchor.constraint(equalTo: surface.centerXAnchor),
-            hintBar.bottomAnchor.constraint(
-                equalTo: surface.bottomAnchor, constant: -Theme.Spacing.lg),
-            undoToast.centerXAnchor.constraint(equalTo: surface.centerXAnchor),
-            undoToast.bottomAnchor.constraint(equalTo: hintBar.bottomAnchor),
         ])
+        let stripView = NSView()
+        strip.contentView = stripView
+        for capsule in [hintBar, undoToast] as [NSView] {
+            capsule.translatesAutoresizingMaskIntoConstraints = false
+            stripView.addSubview(capsule)
+            NSLayoutConstraint.activate([
+                capsule.centerXAnchor.constraint(equalTo: stripView.centerXAnchor),
+                capsule.centerYAnchor.constraint(equalTo: stripView.centerYAnchor),
+            ])
+        }
         // Hidden views keep their constraints, so the field is tied to the tag only while the
         // tag shows; otherwise it runs to the panel's edge.
         fieldToEdge = searchField.trailingAnchor.constraint(
@@ -409,6 +414,9 @@ final class WindowController: NSObject, NSWindowDelegate {
         panel.makeFirstResponder(searchField)
         fade(to: 1, duration: Theme.Motion.appearFade, timing: Theme.Motion.easeOut)
         animateScale(appearing: true)
+        // Empty until ⌘ is held or something is deleted; the capsules fade themselves in.
+        strip.place(under: panel)
+        panel.addChildWindow(strip, ordered: .above)
 
         // A login-item process that has never been activated can drop its first key request —
         // the panel is visible, looks focused, and eats no keys. A no-op the rest of the time.
@@ -427,6 +435,8 @@ final class WindowController: NSObject, NSWindowDelegate {
         fade(to: 0, duration: Theme.Motion.dismissDuration, timing: Theme.Motion.easeIn) {
             [weak self] in
             guard let self, self.panel.alphaValue == 0 else { return }
+            self.panel.removeChildWindow(self.strip)
+            self.strip.orderOut(nil)
             self.panel.orderOut(nil)
         }
         // Preview bitmaps are the memory; row thumbnails stay warm for the next summon.

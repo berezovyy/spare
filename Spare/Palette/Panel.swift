@@ -56,3 +56,42 @@ final class Panel: NSPanel {
     /// Main-window status would route the main menu and app-level state at a summoned palette.
     override var canBecomeMain: Bool { false }
 }
+
+/// A clear, click-through strip attached under the palette, for the ⌘-hold hints and the undo
+/// toast: inside the panel they could only sit on top of the last row. As a child window it
+/// follows a drag and leaves with the palette.
+final class CapsuleStrip: NSPanel {
+    static let gap: CGFloat = 8
+    /// Room around the capsule for the glass's own edge light, which draws past its bounds.
+    static let margin: CGFloat = 6
+
+    init() {
+        let height = Theme.Size.hintBarHeight + 2 * Self.margin
+        super.init(
+            contentRect: NSRect(x: 0, y: 0, width: Theme.Size.panelWidth, height: height),
+            styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+        isFloatingPanel = true
+        level = .floating
+        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        isOpaque = false
+        backgroundColor = .clear
+        // Traced from the capsule's own pixels, so the clear strip around it casts nothing.
+        hasShadow = true
+        ignoresMouseEvents = true
+        animationBehavior = .none
+        isReleasedWhenClosed = false
+        hidesOnDeactivate = false
+    }
+
+    override var canBecomeKey: Bool { false }
+    override var canBecomeMain: Bool { false }
+
+    /// Centred under `parent`, `gap` below its bottom edge.
+    func place(under parent: NSWindow) {
+        let size = frame.size
+        setFrameOrigin(
+            NSPoint(
+                x: parent.frame.midX - size.width / 2,
+                y: parent.frame.minY - Self.gap - size.height + Self.margin))
+    }
+}

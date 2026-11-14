@@ -133,6 +133,9 @@ enum Theme {
 
         /// Pulls the glass toward the ink's opposite so text keeps its contrast over any wallpaper.
         static let glassTint = adaptive(dark: ink(0, 0.30), light: ink(1, 0.40))
+        /// The capsules under the palette: small glass picks up the backdrop's darkness, so their
+        /// text sits on a fill most of the way to the appearance's own background.
+        static let capsuleFill = adaptive(dark: ink(0, 0.35), light: ink(1, 0.75))
         /// Selection fill: the one accent in the palette. Dynamic, so it follows the user's
         /// accent colour; resolve it under the view's appearance before taking a `cgColor`.
         static let selection = NSColor(name: nil) { appearance in

@@ -1,9 +1,12 @@
 import AppKit
 
-/// A small glass capsule of keycaps and words over the bottom of the list. Information, never a
-/// target: clicks fall through to the row under it.
+/// A small glass capsule of keycaps and words, floating just under the palette. Information,
+/// never a target: clicks fall through it.
 class GlassCapsule: NSView {
     private let glass = NSGlassEffectView()
+    /// Small glass takes on the darkness of whatever is behind it however it is tinted, so the
+    /// contrast comes from a fill of its own laid over the glass.
+    private let fill = NSView()
 
     init(_ items: [NSView]) {
         super.init(frame: .zero)
@@ -11,6 +14,11 @@ class GlassCapsule: NSView {
         glass.cornerRadius = Theme.Size.hintBarHeight / 2
         glass.translatesAutoresizingMaskIntoConstraints = false
         addSubview(glass)
+        fill.wantsLayer = true
+        fill.layer?.cornerRadius = Theme.Size.hintBarHeight / 2
+        fill.layer?.cornerCurve = .continuous
+        fill.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(fill)
 
         let hints = NSStackView(views: items)
         hints.orientation = .horizontal
@@ -23,6 +31,10 @@ class GlassCapsule: NSView {
             glass.trailingAnchor.constraint(equalTo: trailingAnchor),
             glass.topAnchor.constraint(equalTo: topAnchor),
             glass.bottomAnchor.constraint(equalTo: bottomAnchor),
+            fill.leadingAnchor.constraint(equalTo: leadingAnchor),
+            fill.trailingAnchor.constraint(equalTo: trailingAnchor),
+            fill.topAnchor.constraint(equalTo: topAnchor),
+            fill.bottomAnchor.constraint(equalTo: bottomAnchor),
             hints.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Theme.Spacing.xl),
             hints.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Theme.Spacing.xl),
             hints.centerYAnchor.constraint(equalTo: centerYAnchor),
@@ -36,6 +48,23 @@ class GlassCapsule: NSView {
     required init?(coder: NSCoder) { nil }
 
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
+
+    /// Resolved per appearance for the reason `PanelSurface` gives.
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        applyTint()
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        applyTint()
+    }
+
+    private func applyTint() {
+        effectiveAppearance.performAsCurrentDrawingAppearance {
+            fill.layer?.backgroundColor = Theme.Colors.capsuleFill.cgColor
+        }
+    }
 
     /// Bumped by every call, so a fade-out that finishes after a newer fade-in leaves it alone.
     private var generation = 0
