@@ -67,9 +67,19 @@ final class AppCore {
         hotKeys.rebind(boundShortcut())
 
         // Never synchronous on the launch path: opening is cheap, reading every row is not.
-        Task { store.load() }
+        Task {
+            store.load()
+            // Watching and loaded: the end-to-end test waits for this instead of guessing from
+            // the database file, which a previous run leaves behind.
+            DistributedNotificationCenter.default().postNotificationName(
+                Self.readyNotification, object: nil, deliverImmediately: true)
+        }
         monitor.start()
     }
+
+    /// Posted once per launch, named after the bundle so Dev and Release never answer each other.
+    static let readyNotification = Notification.Name(
+        (Bundle.main.bundleIdentifier ?? "app.spare") + ".ready")
 
     /// `forever` is nil age; the store spells "never trim" as an unreachable maximum.
     private func applyRetention() {

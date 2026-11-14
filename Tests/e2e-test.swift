@@ -133,7 +133,14 @@ struct EndToEndTests {
     }
 
     /// `-g` keeps the launch in the background: the harness never steals the front from a person.
+    /// Ready means the app said so: the database file alone is left over from the last run, and
+    /// a copy made before the monitor starts is never seen.
     static func launchDev(_ app: URL) -> Bool {
+        nonisolated(unsafe) var ready = false
+        let observer = DistributedNotificationCenter.default().addObserver(
+            forName: Notification.Name(devBundleID + ".ready"), object: nil, queue: .main
+        ) { _ in ready = true }
+        defer { DistributedNotificationCenter.default().removeObserver(observer) }
         let open = Process()
         open.executableURL = URL(fileURLWithPath: "/usr/bin/open")
         open.arguments = ["-g", app.path]
@@ -145,17 +152,11 @@ struct EndToEndTests {
         }
 
         let deadline = Date().addingTimeInterval(20)
-        while Date() < deadline {
-            if !devInstances().isEmpty,
-                FileManager.default.fileExists(atPath: databaseURL().path)
-            {
-                // The store opens the file on the launch path; one more poll lets it finish.
-                Thread.sleep(forTimeInterval: 0.5)
-                return true
-            }
-            Thread.sleep(forTimeInterval: 0.25)
+        while !ready, Date() < deadline {
+            // The run loop, not a sleep: the notification is delivered on it.
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
         }
-        return false
+        return ready
     }
 
     /// Only ever the Dev channel, and never `forceTerminate` before asking politely.
