@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    # macOS 26 and Xcode 26 or later: the app targets macOS 26, and only Xcode 26's actool reads
+    # the Icon Composer icon.
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          swiftc --version
+
+      - name: Lint
+        run: xcrun swift-format lint --strict --recursive Spare Tests
+
+      # e2e writes the system pasteboard and needs an Accessibility grant nobody can click here.
+      - name: Test
+        run: SPARE_SKIP_E2E=1 Scripts/run-tests.sh
+
+      # Unsigned: proves the release build and packaging work, not something to hand out.
+      - name: Package
+        run: Scripts/build-dmg.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Spare-unsigned
+          path: dist/Spare-*.dmg*
+          if-no-files-found: error
