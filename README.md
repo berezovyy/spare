@@ -1,7 +1,23 @@
-# Spare
+<p align="center">
+  <img src="readme/icon.png" width="128" height="128" alt="Spare's icon: a stack of three clipboard cards on a violet tile" />
+</p>
 
-A clipboard history for macOS that stays out of the way. Press **⌘⇧V**, type a few letters of
-something you copied earlier, press Return, and it is pasted where you were typing.
+<h1 align="center">Spare</h1>
+
+<p align="center">
+  <strong>Everything you copied, one keystroke away.</strong><br />
+  A clipboard history for macOS that stays out of the way.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-26%2B-5546f0?style=flat-square&logo=apple&logoColor=white" alt="macOS 26 or later" />
+  <img src="https://img.shields.io/badge/Swift_6-AppKit-f05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 6 and AppKit" />
+  <img src="https://img.shields.io/badge/dependencies-zero-238636?style=flat-square" alt="zero dependencies" />
+  <img src="https://img.shields.io/badge/license-AGPL_v3-8250df?style=flat-square" alt="AGPL v3 license" />
+</p>
+
+Press **⌘⇧V**, type a few letters of something you copied earlier, press Return, and it is pasted
+where you were typing.
 
 Text and images, pinned favourites, type filters. Swift and AppKit, no dependencies, under 1 MB of
 code. Everything stays on your Mac.
