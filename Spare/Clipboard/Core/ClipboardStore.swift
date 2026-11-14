@@ -233,9 +233,13 @@ final class ClipboardStore {
             return
         }
         sqlite3_exec(db, "COMMIT", nil, nil, nil)
-        // Array ops also cover an item surfaced from beyond the resident window.
-        items.removeAll { $0.id == updated.id }
-        items.insert(updated, at: 0)
+        // Array ops also cover an item surfaced from beyond the resident window. Built aside and
+        // assigned once: each assignment fires `onChange`, and an open list re-rendering between
+        // the remove and the insert would lose the row it was keeping the selection on.
+        var next = items
+        next.removeAll { $0.id == updated.id }
+        next.insert(updated, at: 0)
+        items = next
         trimWindow()
     }
 
